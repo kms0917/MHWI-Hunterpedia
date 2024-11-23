@@ -30,7 +30,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
 
     @Override
-    public void onSkillSelected(Skills skill, int selectedLevel) {
+    public void onSkillSelected(SelectedSkill skill, int selectedLevel) {
         boolean skillExists = false;
         // 기존 스킬이 있는지 확인
         for (Pair<String, Integer> skillData : targetSkills) {
@@ -130,7 +130,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     // ExpandableListView 데이터 초기화
     private void initializeExpandableListView() {
         groupList = new ArrayList<>();
-        Map<String, List<Skills>> groupSkillsMap = new HashMap<>();
+        Map<String, List<SelectedSkill>> groupSkillsMap = new HashMap<>();
 
         // 그룹 항목 추가
         groupList.add("공격력");
@@ -138,19 +138,19 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         groupList.add("속성/상태이상 강화");
         groupList.add("예리도");
 
-        List<Skills> attackSkills = new ArrayList<>();
-        attackSkills.add(new Skills("공격력 강화", "attack_boost", createSkillOptions(5), 5));
-        attackSkills.add(new Skills("공격 스킬 2", "attack_skill_2", createSkillOptions(3), 3));
+        List<SelectedSkill> attackSkills = new ArrayList<>();
+        attackSkills.add(new SelectedSkill("공격력 강화", "attack_boost", createSkillOptions(5), 5));
+        attackSkills.add(new SelectedSkill("공격 스킬 2", "attack_skill_2", createSkillOptions(3), 3));
 
-        List<Skills> critSkills = new ArrayList<>();
-        critSkills.add(new Skills("회심", "critical", createSkillOptions(3), 3));
-        critSkills.add(new Skills("회심 스킬 2", "critical_skill_2", createSkillOptions(2), 2));
+        List<SelectedSkill> critSkills = new ArrayList<>();
+        critSkills.add(new SelectedSkill("회심", "critical", createSkillOptions(3), 3));
+        critSkills.add(new SelectedSkill("회심 스킬 2", "critical_skill_2", createSkillOptions(2), 2));
 
-        List<Skills> affinitySkills = new ArrayList<>();
-        affinitySkills.add(new Skills("속성 강화", "element_boost", createSkillOptions(3), 3));
+        List<SelectedSkill> affinitySkills = new ArrayList<>();
+        affinitySkills.add(new SelectedSkill("속성 강화", "element_boost", createSkillOptions(3), 3));
 
-        List<Skills> sharpnessSkills = new ArrayList<>();
-        sharpnessSkills.add(new Skills("예리도 스킬 1", "sharpness_boost", createSkillOptions(5), 5));
+        List<SelectedSkill> sharpnessSkills = new ArrayList<>();
+        sharpnessSkills.add(new SelectedSkill("예리도 스킬 1", "sharpness_boost", createSkillOptions(5), 5));
 
 
         // 각 그룹에 스킬 리스트 추가
