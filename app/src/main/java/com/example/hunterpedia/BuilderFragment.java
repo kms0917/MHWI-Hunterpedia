@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.util.Pair;
 
 public class BuilderFragment extends Fragment implements OnSkillSelectedListener {
 
@@ -26,16 +27,31 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> groupList;
-    private Map<String, List<String>> childMap;
-    private List<String> targetSkills; // TargetSkills 배열
+    private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
 
     @Override
     public void onSkillSelected(Skills skill, int selectedLevel) {
-        String skillInfo = skill.getNameEng() + ":" + selectedLevel;
-        if (!targetSkills.contains(skillInfo)) {
-            targetSkills.add(skillInfo);
+        boolean skillExists = false;
+        // 기존 스킬이 있는지 확인
+        for (Pair<String, Integer> skillData : targetSkills) {
+            if (skillData.first.equals(skill.getNameEng())) {
+                if (selectedLevel == 0) {
+                    // "없음"을 선택한 경우, 리스트에서 제거
+                    targetSkills.remove(skillData);
+                } else {
+                    // 이미 존재하는 스킬이면 레벨을 업데이트
+                    targetSkills.set(targetSkills.indexOf(skillData), new Pair<>(skill.getNameEng(), selectedLevel));
+                }
+                skillExists = true;
+                break;
+            }
+        }
+
+        if (!skillExists && selectedLevel > 0) {
+            targetSkills.add(new Pair<>(skill.getNameEng(), selectedLevel));  // 스킬의 영문 이름과 요구 레벨을 저장
         }
     }
+
 
     @Nullable
     @Override
@@ -47,8 +63,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
         initializeWeaponSlots();
         initializeExpandableListView();
-
-        targetSkills = new ArrayList<>(); // TargetSkills 초기화
 
         ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, weaponSlots);

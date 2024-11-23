@@ -89,17 +89,21 @@ public class SkillListAdapter extends BaseExpandableListAdapter {
         Skills skill = groupSkillsMap.get(groupList.get(groupPosition)).get(childPosition);
         skillName.setText(skill.getName());
 
-        // 레벨 선택을 위한 Spinner 설정
+        // 스피너 설정
         ArrayAdapter<String> levelAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, skill.getSpinnerOptions());
         levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         skillLevelSpinner.setAdapter(levelAdapter);
+
+        // 이미 선택된 레벨이 있으면 그 값을 설정
+        skillLevelSpinner.setSelection(skill.getSelectedLevel());
 
         // 스피너에서 선택된 레벨을 targetSkills에 추가하는 로직
         skillLevelSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
+                if (position >= 0) {
                     int selectedLevel = position;
+                    skill.setSelectedLevel(selectedLevel);  // 선택된 레벨 저장
                     if (listener != null) {
                         listener.onSkillSelected(skill, selectedLevel);
                     }
@@ -113,6 +117,7 @@ public class SkillListAdapter extends BaseExpandableListAdapter {
 
         return convertView;
     }
+
 
 
     @Override
