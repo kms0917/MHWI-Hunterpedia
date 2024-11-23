@@ -184,12 +184,12 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                     Log.d("ArmorBuilder", "Skills loaded: " + skills.size());
                     for (int i = 0; i < Math.min(skills.size(), 5); i++) {
                         Skill skill = skills.get(i);
-
+                        List<Skill.Rank> ranks = skill.getRanks();
                         // 스킬 정보 출력
                         Log.d("ArmorBuilder", "Skill " + (i + 1) + ": " +
                                 "Name: " + skill.getName() +
                                 ", Id: " + skill.getId() +
-                                ", Description: " + skill.getDescription());
+                                ", Description: " + skill.getDescription() + ", rank: " + ranks.size());
                     }
                 } else {
                     // API 호출이 실패한 경우
