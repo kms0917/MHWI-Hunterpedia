@@ -1,6 +1,7 @@
 package com.example.hunterpedia;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -19,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import android.util.Pair;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BuilderFragment extends Fragment implements OnSkillSelectedListener {
 
@@ -83,7 +89,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         });
 
         weaponSpinner.setSelection(0);
-
+        getData();
         return view;
     }
 
@@ -161,6 +167,42 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
         expandableListAdapter = new SkillListAdapter(requireContext(), groupList, groupSkillsMap, this);
         expandableListView.setAdapter(expandableListAdapter);
+    }
+
+    private void getData(){
+        // Retrofit을 사용하여 스킬 데이터를 받아오기
+        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+        Call<List<Skill>> call = apiService.getSkills();
+
+        call.enqueue(new Callback<List<Skill>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Skill>> call, @NonNull Response<List<Skill>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // 스킬 데이터가 성공적으로 받아졌을 때
+                    List<Skill> skills = response.body();
+                    // 받은 스킬 데이터를 처리하는 코드 작성
+                    Log.d("ArmorBuilder", "Skills loaded: " + skills.size());
+                    for (int i = 0; i < Math.min(skills.size(), 5); i++) {
+                        Skill skill = skills.get(i);
+
+                        // 스킬 정보 출력
+                        Log.d("ArmorBuilder", "Skill " + (i + 1) + ": " +
+                                "Name: " + skill.getName() +
+                                ", Id: " + skill.getId() +
+                                ", Description: " + skill.getDescription());
+                    }
+                } else {
+                    // API 호출이 실패한 경우
+                    Log.e("ArmorBuilder", "Failed to load skills.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Skill>> call, @NonNull Throwable t) {
+                // 네트워크 오류 등으로 실패한 경우
+                Log.e("ArmorBuilder", "Error: " + t.getMessage());
+            }
+        });
     }
 
     // Weapon 슬롯 값을 정수 배열로 파싱
