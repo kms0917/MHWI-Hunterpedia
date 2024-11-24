@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.builder;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import android.util.Pair;
+
+import com.example.hunterpedia.R;
+import com.example.hunterpedia.api.ApiClient;
+import com.example.hunterpedia.api.ApiService;
+import com.example.hunterpedia.datastructure.Armor;
+import com.example.hunterpedia.datastructure.Skill;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,7 +74,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         expandableListView = view.findViewById(R.id.expandableListView);
 
         initializeWeaponSlots();
-        initializeExpandableListView();
+        initializeSkillList();
 
         ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, weaponSlots);
@@ -134,7 +140,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     }
 
     // ExpandableListView 데이터 초기화
-    private void initializeExpandableListView() {
+    private void initializeSkillList() {
         groupList = new ArrayList<>();
         Map<String, List<SelectedSkill>> groupSkillsMap = new HashMap<>();
 
@@ -172,24 +178,25 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private void getData(){
         // Retrofit을 사용하여 스킬 데이터를 받아오기
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
-        Call<List<Skill>> call = apiService.getSkills();
+        Call<List<Armor>> call = apiService.getMasterArmors();
 
-        call.enqueue(new Callback<List<Skill>>() {
+        call.enqueue(new Callback<List<Armor>>() {
             @Override
-            public void onResponse(@NonNull Call<List<Skill>> call, @NonNull Response<List<Skill>> response) {
+            public void onResponse(@NonNull Call<List<Armor>> call, @NonNull Response<List<Armor>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // 스킬 데이터가 성공적으로 받아졌을 때
-                    List<Skill> skills = response.body();
+                    List<Armor> armors = response.body();
                     // 받은 스킬 데이터를 처리하는 코드 작성
-                    Log.d("ArmorBuilder", "Skills loaded: " + skills.size());
-                    for (int i = 0; i < Math.min(skills.size(), 5); i++) {
-                        Skill skill = skills.get(i);
-                        List<Skill.Rank> ranks = skill.getRanks();
+                    Log.d("ArmorBuilder", "Armors loaded: " + armors.size());
+                    for (int i = 0; i < armors.size(); i++) {
+                        Armor armor = armors.get(i);
+                        List<Skill.Rank> rank = armor.getSkills();
+                        Skill.Rank rankinfo = rank.get(0);
                         // 스킬 정보 출력
                         Log.d("ArmorBuilder", "Skill " + (i + 1) + ": " +
-                                "Name: " + skill.getName() +
-                                ", Id: " + skill.getId() +
-                                ", Description: " + skill.getDescription() + ", rank: " + ranks.size());
+                                "Name: " + armor.getName() +
+                                ", Id: " + armor.getId() +
+                                ", skills: " + rankinfo.getSkillName() + ", rank: " + rankinfo.getLevel());
                     }
                 } else {
                     // API 호출이 실패한 경우
@@ -198,7 +205,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Skill>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 // 네트워크 오류 등으로 실패한 경우
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
             }

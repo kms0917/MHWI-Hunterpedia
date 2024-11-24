@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.builder;
 
 import java.util.List;
 

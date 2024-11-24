@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

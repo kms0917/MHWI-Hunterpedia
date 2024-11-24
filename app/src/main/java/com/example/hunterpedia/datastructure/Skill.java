@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.datastructure;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
@@ -59,6 +59,9 @@ public class Skill {
         @SerializedName("modifiers")
         private Modifiers modifiers;
 
+        @SerializedName(("skillName"))
+        private String skillName;
+
         // Getters
         public int getId() {
             return id;
@@ -82,6 +85,10 @@ public class Skill {
 
         public Modifiers getModifiers() {
             return modifiers;
+        }
+
+        public String getSkillName() {
+            return skillName;
         }
     }
 

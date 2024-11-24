@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.builder;
 
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class MySetFragment extends Fragment {
+import com.example.hunterpedia.R;
+
+public class DecoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.myset_fragment, container, false);
+        return inflater.inflate(R.layout.deco_fragment, container, false);
     }
 }

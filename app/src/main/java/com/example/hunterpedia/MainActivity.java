@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.view.View;
 
+import com.example.hunterpedia.builder.ArmorBuilder;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override

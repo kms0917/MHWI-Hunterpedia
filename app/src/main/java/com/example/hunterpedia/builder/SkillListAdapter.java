@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.builder;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.example.hunterpedia.R;
 
 import java.util.List;
 import java.util.Map;
