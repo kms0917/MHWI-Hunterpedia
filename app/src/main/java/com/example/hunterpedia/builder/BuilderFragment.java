@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import android.util.Pair;
 import com.example.hunterpedia.R;
 import com.example.hunterpedia.api.ApiClient;
 import com.example.hunterpedia.api.ApiService;
+import com.example.hunterpedia.datastructure.Armor;
 import com.example.hunterpedia.datastructure.Skill;
 
 import retrofit2.Call;
@@ -36,8 +39,11 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private Spinner weaponSpinner;
     private List<String> weaponSlots;
     private ExpandableListView expandableListView;
+    private TextView targetSkillView;
+    private Button searchBtn;
     private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
     private List<Skill> skills;
+    private List<Armor> armors;
 
     @Override
     public void onSkillSelected(SelectedSkill skill, int selectedLevel) {
@@ -60,6 +66,16 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         if (!skillExists && selectedLevel > 0) {
             targetSkills.add(new Pair<>(skill.getName(), selectedLevel));  // 스킬의 이름과 요구 레벨을 저장
         }
+
+        StringBuilder skillsText = new StringBuilder("Selected Skills:\n");
+        for (Pair<String, Integer> skillData : targetSkills) {
+            skillsText.append(skillData.first)
+                    .append(" (Level: ")
+                    .append(skillData.second)
+                    .append(")\n");
+        }
+
+        targetSkillView.setText(skillsText.toString().trim());
     }
 
 
@@ -70,8 +86,10 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
         weaponSpinner = view.findViewById(R.id.weaponspinner);
         expandableListView = view.findViewById(R.id.expandableListView);
+        targetSkillView = view.findViewById(R.id.targetSkill);
+        searchBtn = view.findViewById(R.id.search);
 
-        getData();
+        getSkillData();
         initializeWeaponSlots();
 
         ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(requireContext(),
@@ -89,6 +107,16 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (armors == null){
+                    getArmorData();
+                }
+                searchArmors();
             }
         });
 
@@ -380,8 +408,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         expandableListView.setAdapter(expandableListAdapter);
     }
 
-    private void getData(){
-        // Retrofit을 사용하여 스킬 데이터를 받아오기
+    private void getSkillData(){
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Skill>> call = apiService.getSkills();
 
@@ -393,25 +420,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                     skills = response.body();
                     // 받은 스킬 데이터를 처리하는 코드 작성
                     Log.d("ArmorBuilder", "Armors loaded: " + skills.size());
-                    for (int i = 0; i < skills.size(); i++) {
-                        Skill skill = skills.get(i);
-                        List<Skill.Rank> rank = skill.getRanks();
-                        // 스킬 정보 출력
-                        Log.d("ArmorBuilder", "Skill " + (i + 1) + ": " +
-                                "Name: " + skill.getName() +
-                                ", Id: " + skill.getId() + ", Description:" + skill.getDescription() + ", rank: " + rank.size());
-                    }
                     initializeSkillList();
-//                    for (int i = 0; i < armors.size(); i++) {
-//                        Armor armor = armors.get(i);
-//                        List<Skill.Rank> rank = armor.getSkills();
-//                        Skill.Rank rankinfo = rank.get(0);
-//                        // 스킬 정보 출력
-//                        Log.d("ArmorBuilder", "Skill " + (i + 1) + ": " +
-//                                "Name: " + armor.getName() +
-//                                ", Id: " + armor.getId() +
-//                                ", skills: " + rankinfo.getSkillName() + ", rank: " + rankinfo.getLevel());
-//                    }
                 } else {
                     // API 호출이 실패한 경우
                     Log.e("ArmorBuilder", "Failed to load skills.");
@@ -424,6 +433,33 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
             }
         });
+    }
+
+    private void getArmorData(){
+        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+        Call<List<Armor>> call = apiService.getMasterArmors();
+
+        call.enqueue(new Callback<List<Armor>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Armor>> call, @NonNull Response<List<Armor>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    armors = response.body();
+                    Log.d("ArmorBuilder", "Armors loaded: " + armors.size());
+                } else {
+                    // API 호출이 실패한 경우
+                    Log.e("ArmorBuilder", "Failed to load skills.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
+                Log.e("ArmorBuilder", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    private void searchArmors(){
+
     }
 
     // Weapon 슬롯 값을 정수 배열로 파싱
