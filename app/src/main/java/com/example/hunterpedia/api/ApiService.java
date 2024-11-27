@@ -1,6 +1,8 @@
 package com.example.hunterpedia.api;
 
 import com.example.hunterpedia.datastructure.Armor;
+import com.example.hunterpedia.datastructure.Charm;
+import com.example.hunterpedia.datastructure.Decoration;
 import com.example.hunterpedia.datastructure.Skill;
 
 import java.util.List;
@@ -18,4 +20,10 @@ public interface ApiService {
 
     @GET("armor?q={\"rank\":\"high\"}")
     Call<List<Armor>> getHighArmors();
+
+    @GET("decorations")
+    Call<List<Decoration>> getDecorations();
+
+    @GET("charms")
+    Call<List<Charm>> getCharms();
 }

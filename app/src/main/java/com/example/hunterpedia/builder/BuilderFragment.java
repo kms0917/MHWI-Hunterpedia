@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,8 @@ import com.example.hunterpedia.R;
 import com.example.hunterpedia.api.ApiClient;
 import com.example.hunterpedia.api.ApiService;
 import com.example.hunterpedia.datastructure.Armor;
+import com.example.hunterpedia.datastructure.Charm;
+import com.example.hunterpedia.datastructure.Decoration;
 import com.example.hunterpedia.datastructure.Skill;
 
 import retrofit2.Call;
@@ -41,9 +45,12 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private ExpandableListView expandableListView;
     private TextView targetSkillView;
     private Button searchBtn;
+    private TextView resultView;
     private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
     private List<Skill> skills;
     private List<Armor> armors;
+    private List<Decoration> decorations;
+    private List<Charm> charms;
 
     @Override
     public void onSkillSelected(SelectedSkill skill, int selectedLevel) {
@@ -75,6 +82,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                     .append(")\n");
         }
 
+// 텍스트 업데이트
         targetSkillView.setText(skillsText.toString().trim());
     }
 
@@ -88,6 +96,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         expandableListView = view.findViewById(R.id.expandableListView);
         targetSkillView = view.findViewById(R.id.targetSkill);
         searchBtn = view.findViewById(R.id.search);
+        resultView = view.findViewById(R.id.testresult);
 
         getSkillData();
         initializeWeaponSlots();
@@ -113,14 +122,12 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (armors == null){
-                    getArmorData();
-                }
                 searchArmors();
             }
         });
 
         weaponSpinner.setSelection(0);
+        getData();
         return view;
     }
 
@@ -381,7 +388,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         skillCategoryMap.put(181, null);
 
 
-
         for (int i = 0; i < 108; i++) {
             Skill skill = skills.get(i);
             List<SelectedSkill> targetList = skillCategoryMap.get(skill.getId());
@@ -408,7 +414,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         expandableListView.setAdapter(expandableListAdapter);
     }
 
-    private void getSkillData(){
+    private void getSkillData() {
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Skill>> call = apiService.getSkills();
 
@@ -419,7 +425,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                     // 스킬 데이터가 성공적으로 받아졌을 때
                     skills = response.body();
                     // 받은 스킬 데이터를 처리하는 코드 작성
-                    Log.d("ArmorBuilder", "Armors loaded: " + skills.size());
+                    Log.d("ArmorBuilder", "Skills loaded: " + skills.size());
                     initializeSkillList();
                 } else {
                     // API 호출이 실패한 경우
@@ -435,7 +441,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         });
     }
 
-    private void getArmorData(){
+    private void getData() {
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Armor>> call = apiService.getMasterArmors();
 
@@ -444,10 +450,11 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             public void onResponse(@NonNull Call<List<Armor>> call, @NonNull Response<List<Armor>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     armors = response.body();
+                    Collections.reverse(armors);
                     Log.d("ArmorBuilder", "Armors loaded: " + armors.size());
                 } else {
                     // API 호출이 실패한 경우
-                    Log.e("ArmorBuilder", "Failed to load skills.");
+                    Log.e("ArmorBuilder", "Failed to load armors.");
                 }
             }
 
@@ -456,10 +463,259 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
             }
         });
+
+        Call<List<Decoration>> call2 = apiService.getDecorations();
+
+        call2.enqueue(new Callback<List<Decoration>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Decoration>> call, @NonNull Response<List<Decoration>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    decorations = response.body();
+                    Log.d("ArmorBuilder", "Decorations loaded: " + decorations.size());
+                } else {
+                    // API 호출이 실패한 경우
+                    Log.e("ArmorBuilder", "Failed to load Decorations.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Decoration>> call, @NonNull Throwable t) {
+                Log.e("ArmorBuilder", "Error: " + t.getMessage());
+            }
+        });
+
+        Call<List<Charm>> call3 = apiService.getCharms();
+
+        call3.enqueue(new Callback<List<Charm>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Charm>> call, @NonNull Response<List<Charm>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    charms = response.body();
+//                    for (int i = 0;i < 1; i++) {
+//                        Charm charm = charms.get(i);
+//                        Log.d("ArmorBuilder", "Charm: " + charm.getName() + " (ID: " + charm.getId() + ")");
+//                        for (Charm.CharmRank rank : charm.getRanks()) {
+//                            Log.d("ArmorBuilder", "  Rank Level: " + rank.getLevel() + " (Rarity: " + rank.getRarity() + ")");
+//                            for (Skill.Rank skill : rank.getSkills()) {
+//                                Log.d("ArmorBuilder", "    Skill: " + skill.getSkillName() + " (Level: " + skill.getLevel() + ")");
+//                            }
+//                        }
+//                    }
+                    Log.d("ArmorBuilder", "Charms loaded: " + charms.size());
+                    searchBtn.setVisibility(View.VISIBLE);
+                } else {
+                    // API 호출이 실패한 경우
+                    Log.e("ArmorBuilder", "Failed to load Charms.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Charm>> call, @NonNull Throwable t) {
+                Log.e("ArmorBuilder", "Error: " + t.getMessage());
+            }
+        });
     }
 
-    private void searchArmors(){
+    private void searchArmors() {
+        if (targetSkills.isEmpty()){
+            resultView.setText("");  // 기존 내용을 지웁니다.
+            resultView.append("Please Select Some Skills.\n");
+            return;
+        }
+        // 결과를 저장할 리스트
+        List<String> results = new ArrayList<>();
 
+        // 1. 호석 필터링: 필요한 레벨을 초과하지 않는 호석들만 선택
+        List<Pair<Charm, Integer>> filteredCharms = new ArrayList<>();
+        // targetSkills는 미리 정의된 필요한 스킬들의 이름 리스트라고 가정
+        for (Charm charm : charms) {
+            for (Charm.CharmRank charmRank : charm.getRanks()){
+                for (Skill.Rank charmSkill : charmRank.getSkills()){
+                    if (charmSkill != null){
+                        for (Pair<String, Integer> skill : targetSkills){
+                            if (skill.first.equals(charmSkill.getSkillName()) && skill.second >= charmSkill.getLevel()){
+                                // 이미 존재하는 호석인지 확인
+                                boolean exists = false;
+
+                                for (int i = 0; i < filteredCharms.size(); i++) {
+                                    Pair<Charm, Integer> existing = filteredCharms.get(i);
+
+                                    if (existing.first.equals(charm)) {
+                                        // 이미 있는 호석이면 Skill.Rank를 갱신
+                                        if (existing.second < charmSkill.getLevel()) {
+                                            filteredCharms.set(i, new Pair<>(charm, charmSkill.getLevel()));
+                                        }
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+
+                                // 리스트에 없는 경우 새로 추가
+                                if (!exists) {
+                                    filteredCharms.add(new Pair<>(charm, charmSkill.getLevel()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        resultView.setText("");  // 기존 내용을 지웁니다.
+        if (filteredCharms.isEmpty()) {
+            resultView.append("No charms found that meet the requirements.\n");
+        } else {
+            resultView.append("Filtered Charms:\n");
+
+            for (Pair<Charm, Integer> filteredCharm : filteredCharms) {
+                Charm charm = filteredCharm.first;  // 호석 정보
+                int skillLevel = filteredCharm.second;  // 연결된 스킬 레벨 정보
+
+                // 호석 이름과 연결된 스킬 레벨 정보만 출력
+                resultView.append("Charm: " + charm.getName() + "\n");
+                resultView.append("Skill: " + charm.getRanks().get(0).getSkills().get(0).getSkillName() + "\n");
+                resultView.append("  Filtered Skill Level: " + skillLevel + "\n");
+            }
+        }
+
+
+
+//        // 2. 장식주 필터링: 필요한 스킬만 포함된 장식주 선택
+//        List<Decoration> filteredDecorations = new ArrayList<>();
+//        for (Decoration decoration : decorations) {
+//            boolean hasUsefulSkill = false;
+//            for (Skill.Rank skill : decoration.getSkills()) {
+//                if (requiredSkills.containsKey(skill.getSkillName())) {
+//                    hasUsefulSkill = true;
+//                    break;
+//                }
+//            }
+//            if (hasUsefulSkill) {
+//                filteredDecorations.add(decoration);
+//            }
+//        }
+//
+//        if (filteredDecorations.isEmpty()) {
+//            results.add("No suitable decorations found to fulfill the requirements.");
+//            System.out.println(String.join("\n", results));
+//            return;
+//        }
+//
+//        // 3. 방어구 조합 생성
+//        List<List<Armor>> armorCombinations = generateArmorCombinations();
+//
+//        // 4. 브루트 포스 탐색
+//        for (List<Armor> armorSet : armorCombinations) {
+//            Map<String, Integer> currentSkills = new HashMap<>();
+//            int totalSlots = 0;
+//
+//            // 방어구 스킬 및 슬롯 합산
+//            for (Armor armor : armorSet) {
+//                for (Skill.Rank skill : armor.getSkills()) {
+//                    currentSkills.put(skill.getSkillName(),
+//                            currentSkills.getOrDefault(skill.getSkillName(), 0) + skill.getLevel());
+//                }
+//                totalSlots += armor.getSlots();
+//            }
+//
+//            // 각 방어구 조합에 대해 호석 선택
+//            for (Charm charm : filteredCharms) {
+//                Map<String, Integer> tempSkills = new HashMap<>(currentSkills);
+//                for (Charm.CharmRank rank : charm.getRanks()) {
+//                    for (Skill.Rank skill : rank.getSkills()) {
+//                        tempSkills.put(skill.getSkillName(),
+//                                tempSkills.getOrDefault(skill.getSkillName(), 0) + skill.getLevel());
+//                    }
+//                }
+//
+//                // 장식주로 부족한 스킬 충족
+//                List<Decoration> selectedDecorations = new ArrayList<>();
+//                int usedSlots = 0;
+//
+//                for (Decoration decoration : filteredDecorations) {
+//                    if (usedSlots >= totalSlots) break; // 슬롯이 다 찼으면 중단
+//                    for (Skill.Rank skill : decoration.getSkills()) {
+//                        if (requiredSkills.containsKey(skill.getSkillName()) &&
+//                                tempSkills.getOrDefault(skill.getSkillName(), 0) < requiredSkills.get(skill.getSkillName())) {
+//                            selectedDecorations.add(decoration);
+//                            usedSlots += decoration.getSlot();
+//                            tempSkills.put(skill.getSkillName(),
+//                                    tempSkills.getOrDefault(skill.getSkillName(), 0) + skill.getLevel());
+//                            break; // 한 장식주는 한 번만 선택
+//                        }
+//                    }
+//                }
+//
+//                // 스킬 충족 여부 확인
+//                if (isSkillsSatisfied(tempSkills, requiredSkills)) {
+//                    // 결과 저장
+//                    results.add("Selected Armor:");
+//                    for (Armor armor : armorSet) {
+//                        results.add(armor.getName());
+//                    }
+//
+//                    results.add("Selected Decorations:");
+//                    for (Decoration decoration : selectedDecorations) {
+//                        results.add(decoration.getName());
+//                    }
+//
+//                    results.add("Selected Charm:");
+//                    results.add(charm.getName());
+//
+//                    // 결과 출력 및 종료
+//                    System.out.println(String.join("\n", results));
+//                    return;
+//                }
+//            }
+//        }
+//
+//        // 조건을 만족하는 조합을 찾지 못한 경우
+//        results.add("No suitable combination found to fulfill the requirements.");
+//        System.out.println(String.join("\n", results));
+    }
+
+
+    // 방어구 조합 생성 함수
+    private List<List<Armor>> generateArmorCombinations() {
+        List<List<Armor>> combinations = new ArrayList<>();
+
+        List<Armor> headArmors = filterArmorsByType("head");
+        List<Armor> chestArmors = filterArmorsByType("chest");
+        List<Armor> glovesArmors = filterArmorsByType("gloves");
+        List<Armor> waistArmors = filterArmorsByType("waist");
+        List<Armor> legsArmors = filterArmorsByType("legs");
+
+        for (Armor head : headArmors) {
+            for (Armor chest : chestArmors) {
+                for (Armor gloves : glovesArmors) {
+                    for (Armor waist : waistArmors) {
+                        for (Armor legs : legsArmors) {
+                            combinations.add(Arrays.asList(head, chest, gloves, waist, legs));
+                        }
+                    }
+                }
+            }
+        }
+
+        return combinations;
+    }
+
+    // 특정 유형의 방어구 필터링
+    private List<Armor> filterArmorsByType(String type) {
+        return armors.stream()
+                .filter(armor -> armor.getType().equals(type)) // 유형별로 필터링
+                .toList();
+    }
+
+
+    // 스킬 충족 여부 확인 함수
+    private boolean isSkillsSatisfied(Map<String, Integer> currentSkills, Map<String, Integer> requiredSkills) {
+        for (Map.Entry<String, Integer> entry : requiredSkills.entrySet()) {
+            if (currentSkills.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
+                return false; // 하나라도 충족되지 않으면 false
+            }
+        }
+        return true;
     }
 
     // Weapon 슬롯 값을 정수 배열로 파싱
