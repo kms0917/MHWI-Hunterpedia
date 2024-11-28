@@ -18,6 +18,21 @@ public interface ApiService {
     @GET("armor?q={\"rank\":\"master\"}")
     Call<List<Armor>> getMasterArmors();
 
+    @GET("armor?q={\"type\":\"head\", \"rank\":\"master\"}")
+    Call<List<Armor>> getHeadArmors();
+
+    @GET("armor?q={\"type\":\"chest\", \"rank\":\"master\"}")
+    Call<List<Armor>> getChestArmors();
+
+    @GET("armor?q={\"type\":\"gloves\", \"rank\":\"master\"}")
+    Call<List<Armor>> getGlovesArmors();
+
+    @GET("armor?q={\"type\":\"waist\", \"rank\":\"master\"}")
+    Call<List<Armor>> getWaistArmors();
+
+    @GET("armor?q={\"type\":\"legs\", \"rank\":\"master\"}")
+    Call<List<Armor>> getLegsArmors();
+
     @GET("armor?q={\"rank\":\"high\"}")
     Call<List<Armor>> getHighArmors();
 
