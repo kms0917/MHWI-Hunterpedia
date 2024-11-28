@@ -491,16 +491,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             public void onResponse(@NonNull Call<List<Charm>> call, @NonNull Response<List<Charm>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     charms = response.body();
-//                    for (int i = 0;i < 1; i++) {
-//                        Charm charm = charms.get(i);
-//                        Log.d("ArmorBuilder", "Charm: " + charm.getName() + " (ID: " + charm.getId() + ")");
-//                        for (Charm.CharmRank rank : charm.getRanks()) {
-//                            Log.d("ArmorBuilder", "  Rank Level: " + rank.getLevel() + " (Rarity: " + rank.getRarity() + ")");
-//                            for (Skill.Rank skill : rank.getSkills()) {
-//                                Log.d("ArmorBuilder", "    Skill: " + skill.getSkillName() + " (Level: " + skill.getLevel() + ")");
-//                            }
-//                        }
-//                    }
                     Log.d("ArmorBuilder", "Charms loaded: " + charms.size());
                     searchBtn.setVisibility(View.VISIBLE);
                 } else {
@@ -561,45 +551,66 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             }
         }
 
-        resultView.setText("");  // 기존 내용을 지웁니다.
-        if (filteredCharms.isEmpty()) {
-            resultView.append("No charms found that meet the requirements.\n");
-        } else {
-            resultView.append("Filtered Charms:\n");
+//        resultView.setText("");  // 기존 내용을 지웁니다.
+//        if (filteredCharms.isEmpty()) {
+//            resultView.append("No charms found that meet the requirements.\n");
+//        } else {
+//            resultView.append("Filtered Charms:\n");
+//
+//            for (Pair<Charm, Integer> filteredCharm : filteredCharms) {
+//                Charm charm = filteredCharm.first;  // 호석 정보
+//                int skillLevel = filteredCharm.second;  // 연결된 스킬 레벨 정보
+//
+//                // 호석 이름과 연결된 스킬 레벨 정보만 출력
+//                resultView.append("Charm: " + charm.getName() + "\n");
+//                resultView.append("Skill: " + charm.getRanks().get(0).getSkills().get(0).getSkillName() + "\n");  //추후 실 계산시 얘네 사용하면 됨
+//                resultView.append("  Filtered Skill Level: " + skillLevel + "\n");
+//            }
+//        }
 
-            for (Pair<Charm, Integer> filteredCharm : filteredCharms) {
-                Charm charm = filteredCharm.first;  // 호석 정보
-                int skillLevel = filteredCharm.second;  // 연결된 스킬 레벨 정보
 
-                // 호석 이름과 연결된 스킬 레벨 정보만 출력
-                resultView.append("Charm: " + charm.getName() + "\n");
-                resultView.append("Skill: " + charm.getRanks().get(0).getSkills().get(0).getSkillName() + "\n");
-                resultView.append("  Filtered Skill Level: " + skillLevel + "\n");
+
+// 2. 장식주 필터링: 필요한 스킬만 포함된 장식주 선택
+        List<Decoration> filteredDecorations = new ArrayList<>();
+        for (Decoration decoration : decorations) {
+            boolean isValid = true;
+            for (Skill.Rank rank : decoration.getSkills()) {
+                boolean isMatched = false;
+                for (Pair<String, Integer> skill : targetSkills) {
+                    if (rank.getSkillName().equals(skill.first) && rank.getLevel() <= skill.second) {
+                        isMatched = true;
+                        break;
+                    }
+                }
+                if (!isMatched) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (isValid) {
+                filteredDecorations.add(decoration);
             }
         }
 
+        resultView.setText("");
+        if (filteredDecorations.isEmpty()) {
+            resultView.append("No suitable decorations found to fulfill the requirements.\n");
+        } else {
+            resultView.append("Filtered Decorations:\n");
+            for (Decoration decoration : filteredDecorations) {
+                // 장식주 이름 출력
+                resultView.append("Decoration: " + decoration.getName() + "\n");
+                if (decoration.getSkills() != null && !decoration.getSkills().isEmpty()) {
+                    for (Skill.Rank skill : decoration.getSkills()) {
+                        resultView.append("  Skill: " + skill.getSkillName() + "\n");
+                        resultView.append("  Skill Level: " + skill.getLevel() + "\n");
+                    }
+                } else {
+                    resultView.append("  No skill information available.\n");
+                }
+            }
+        }
 
-
-//        // 2. 장식주 필터링: 필요한 스킬만 포함된 장식주 선택
-//        List<Decoration> filteredDecorations = new ArrayList<>();
-//        for (Decoration decoration : decorations) {
-//            boolean hasUsefulSkill = false;
-//            for (Skill.Rank skill : decoration.getSkills()) {
-//                if (requiredSkills.containsKey(skill.getSkillName())) {
-//                    hasUsefulSkill = true;
-//                    break;
-//                }
-//            }
-//            if (hasUsefulSkill) {
-//                filteredDecorations.add(decoration);
-//            }
-//        }
-//
-//        if (filteredDecorations.isEmpty()) {
-//            results.add("No suitable decorations found to fulfill the requirements.");
-//            System.out.println(String.join("\n", results));
-//            return;
-//        }
 //
 //        // 3. 방어구 조합 생성
 //        List<List<Armor>> armorCombinations = generateArmorCombinations();
