@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     private Button searchBtn;
     private TextView resultView;
     private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
+    private ArrayList<Pair<String, Integer>> inputSkills = new ArrayList<>();
     private List<Skill> skills;
     private List<Armor> headArmors;
     private List<Armor> chestArmors;
@@ -62,14 +64,14 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     public void onSkillSelected(SelectedSkill skill, int selectedLevel) {
         boolean skillExists = false;
         // 기존 스킬이 있는지 확인
-        for (Pair<String, Integer> skillData : targetSkills) {
+        for (Pair<String, Integer> skillData : inputSkills) {
             if (skillData.first.equals(skill.getName())) {
                 if (selectedLevel == 0) {
                     // "없음"을 선택한 경우, 리스트에서 제거
-                    targetSkills.remove(skillData);
+                    inputSkills.remove(skillData);
                 } else {
                     // 이미 존재하는 스킬이면 레벨을 업데이트
-                    targetSkills.set(targetSkills.indexOf(skillData), new Pair<>(skill.getName(), selectedLevel));
+                    inputSkills.set(inputSkills.indexOf(skillData), new Pair<>(skill.getName(), selectedLevel));
                 }
                 skillExists = true;
                 break;
@@ -77,11 +79,11 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         }
 
         if (!skillExists && selectedLevel > 0) {
-            targetSkills.add(new Pair<>(skill.getName(), selectedLevel));  // 스킬의 이름과 요구 레벨을 저장
+            inputSkills.add(new Pair<>(skill.getName(), selectedLevel));  // 스킬의 이름과 요구 레벨을 저장
         }
 
         StringBuilder skillsText = new StringBuilder("Selected Skills:\n");
-        for (Pair<String, Integer> skillData : targetSkills) {
+        for (Pair<String, Integer> skillData : inputSkills) {
             skillsText.append(skillData.first)
                     .append(" (Level: ")
                     .append(skillData.second)
@@ -128,6 +130,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                targetSkills = inputSkills;
                 searchArmors();
             }
         });
@@ -597,8 +600,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             resultView.append("Please Select Some Skills.\n");
             return;
         }
-        //호석 필터링
-        List<Pair<Charm, Integer>> filteredCharms = filteringCharms();
 
 // 2. 장식주 필터링: 필요한 스킬만 포함된 장식주 선택
         List<Decoration> filteredDecorations = filteringDeorations();
@@ -615,60 +616,137 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         }
 
         //시리즈 입력이 있을 시 시리즈 중에서 먼저 장비 선택, 선택 방식은 아래와 같이 평가 후 평가치가 가장 높은 시리즈 장비 선택하는 방식으로
+        //장비 선택
+        Armor[] selectedArmors = createArmorSet(headArmors, chestArmors, glovesArmors, waistArmors, legsArmors, slotMin, slotMax);
 
-        // Armor 배열: 0=head, 1=chest, 2=gloves, 3=waist, 4=legs
-        Armor[] selectedArmors = new Armor[5];
-        boolean[] checkSelected = {false, false, false, false, false};  //아무 장비도 선택되지 않았으므로 다 false
-
-        List<Pair<Armor, Integer>> filteredHead = filteringHeads(headArmors, slotMin, slotMax);     //시리즈 입력이 없을때의 상황으로 일단 진행
-        List<Pair<Armor, Integer>> filteredChest = filteringChests(chestArmors, slotMin, slotMax);
-        List<Pair<Armor, Integer>> filteredGloves = filteringGloves(glovesArmors, slotMin, slotMax);
-        List<Pair<Armor, Integer>> filteredWaist = filteringWaists(waistArmors, slotMin, slotMax);
-        List<Pair<Armor, Integer>> filteredLegs = filteringLegs(legsArmors, slotMin, slotMax);
-
-        for (int i = 0; i < 5; i++){
-            Armor selectedArmor = chooseArmor(filteredHead, filteredChest, filteredGloves, filteredWaist, filteredLegs, checkSelected);
-            // 2. 선택된 장비의 부위 인덱스에 저장
-            switch (selectedArmor.getType()) {
-                case "head":
-                    if (selectedArmors[0] == null)
-                        selectedArmors[0] = selectedArmor;
-                    checkSelected[0] = true;
-                    break;
-                case "chest":
-                    if (selectedArmors[1] == null)
-                        selectedArmors[1] = selectedArmor;
-                    checkSelected[1] = true;
-                    break;
-                case "gloves":
-                    if (selectedArmors[2] == null)
-                        selectedArmors[2] = selectedArmor;
-                    checkSelected[2] = true;
-                    break;
-                case "waist":
-                    if (selectedArmors[3] == null)
-                        selectedArmors[3] = selectedArmor;
-                    checkSelected[3] = true;
-                    break;
-                case "legs":
-                    if (selectedArmors[4] == null)
-                        selectedArmors[4] = selectedArmor;
-                    checkSelected[4] = true;
-                    break;
+        //호석 필터링
+        List<Pair<Charm, Integer>> filteredCharms = filteringCharms();
+        filteredDecorations = filteringDeorations();    //갱신된 targetSkills로 다시 장식주 필터링
+        
+        Map<Integer, Integer> decorationSlots = new HashMap<>(); // <슬롯 크기, 사용 가능한 슬롯 수>
+        for (Armor armor : selectedArmors) {
+            if (armor != null) {
+                for (Armor.Slot slot : armor.getSlots()) {
+                    int slotSize = slot.getRank();
+                    decorationSlots.put(slotSize, decorationSlots.getOrDefault(slotSize, 0) + 1);   //입력받은 무기 장식주 칸도 추가해야함
+                }
             }
-            updateTargetSkills(selectedArmor);
-            // 4. 해당 부위 필터링 리스트 재평가
-            if (selectedArmors[0] == null) filteredHead = filteringHeads(headArmors, slotMin, slotMax);
-            if (selectedArmors[1] == null) filteredChest = filteringChests(chestArmors, slotMin, slotMax);
-            if (selectedArmors[2] == null) filteredGloves = filteringGloves(glovesArmors, slotMin, slotMax);
-            if (selectedArmors[3] == null) filteredWaist = filteringWaists(waistArmors, slotMin, slotMax);
-            if (selectedArmors[4] == null) filteredLegs = filteringLegs(legsArmors, slotMin, slotMax);
         }
-        // 최종 선택된 장비들 출력
-        resultView.setText(""); // TextView 초기화
-        for (int i = 0; i < selectedArmors.length; i++) {
-            if (selectedArmors[i] != null) {
-                resultView.append(selectedArmors[i].getName() + " (" + selectedArmors[i].getType() + ")\n");
+        // 2. filteredCharms 순회하면서 남은 슬롯에 장식주 장착
+        for (Pair<Charm, Integer> charmPair : filteredCharms) {
+            List<Decoration> selectedDecorations = new ArrayList<>();
+            Charm charm = charmPair.first;
+            int charmSkillLevel = charmPair.second;
+            for (Skill.Rank charmRank : charm.getRanks().get(0).getSkills()) {
+                String charmSkillName = charmRank.getSkillName();
+                // targetSkills를 순회하면서 charmSkillName과 같은 이름의 스킬을 찾기
+                for (Pair<String, Integer> targetSkillPair : targetSkills) {
+                    int i = 0;
+                    String targetSkillName = targetSkillPair.first;
+                    int targetSkillLevel = targetSkillPair.second;
+                    // 스킬 이름이 같으면, targetSkills의 스킬 레벨에서 charmSkillLevel만큼 빼기
+                    if (charmSkillName.equals(targetSkillName)) {
+                        int newSkillLevel = targetSkillLevel - charmSkillLevel;
+                        // 레벨이 0 이상인 경우만 수정, 0보다 작아지면 제거할 수 있습니다.
+                        if (newSkillLevel > 0) {
+                            targetSkills.set(i, new Pair<>(targetSkillName, newSkillLevel));
+                        } else {
+                           targetSkills.remove(targetSkillPair);
+                           i--;
+                        }
+                    }
+                    i++;
+                }
+            }
+
+            for (int slotSize = 1; slotSize <= 4; slotSize++) {  // 작은 슬롯부터 큰 슬롯까지 순회
+                int availableSlots = decorationSlots.getOrDefault(slotSize, 0);  // 현재 슬롯 크기의 가용 슬롯 수
+
+                for (int i = 0; i < availableSlots; i++) {  // 슬롯의 갯수만큼 순회
+                    // filteredDecorations에서 장식주 순회
+                    for (Decoration decoration : filteredDecorations) {
+                        // 슬롯 크기 확인
+                        if (decoration.getSlot() <= slotSize) {
+                            // 장식주에서 제공하는 첫 번째 스킬을 가져옴 (가정: 한 개의 스킬만 제공)
+                            Skill.Rank skill = decoration.getSkills().get(0);
+                            String skillName = skill.getSkillName();
+                            int decorationLevel = skill.getLevel();
+                            // targetSkills에서 해당 스킬을 찾아서 레벨 갱신
+                            updateTargetSkillsbyName(skillName, decorationLevel);
+                            if (decorationLevel == 1 && decoration.getSlot() == 4){
+                                skill = decoration.getSkills().get(1);
+                                skillName = skill.getSkillName();
+                                decorationLevel = skill.getLevel();
+                                updateTargetSkillsbyName(skillName, decorationLevel);
+                            }
+                            // 장식주 장착
+                            selectedDecorations.add(decoration);
+                            // 장식주를 장착했으면 filteredDecorations 갱신
+                            filteredDecorations = filteringDeorations();
+                            break;  // 하나의 슬롯에서 장식주는 한 개만 장착
+                        }
+                    }
+                }
+            }
+            //여기에 targetSkills가 비었는지 확인, 비었다면 charm, selectedDecorations, selectedArmor들의 정보 출력 후 전체 합산 스킬 목록 출력하고 break
+            if (targetSkills.isEmpty()) {
+                // targetSkills가 비었으면, charm, selectedDecorations, selectedArmor들의 정보 출력
+                StringBuilder resultText = new StringBuilder();
+
+                resultText.append("Charm Information: ").append(charm.getName()).append(", Level : ").append(charmSkillLevel).append("\n");
+                // Selected Decorations 정보 출력
+                resultText.append("Selected Decorations: \n");
+                for (Decoration decoration : selectedDecorations) {
+                    resultText.append("Name: ").append(decoration.getName()).append("\n");
+                    resultText.append("Skills: ");
+                    for (Skill.Rank skill : decoration.getSkills()) {
+                        resultText.append(skill.getSkillName()).append(": ").append(skill.getLevel()).append(" ");
+                    }
+                    resultText.append("\n");
+                }
+
+                // Selected Armors 정보 출력
+                resultText.append("Selected Armors: \n");
+                for (Armor armor : selectedArmors) {
+                    resultText.append("Name: ").append(armor.getName()).append("\n");
+                    resultText.append("Skills: ");
+                    for (Skill.Rank skill : armor.getSkills()) {
+                        resultText.append(skill.getSkillName()).append(": ").append(skill.getLevel()).append(" ");
+                    }
+                    resultText.append("\n");
+                }
+
+                // 전체 합산된 스킬 목록 출력
+                Map<String, Integer> totalSkills = new HashMap<>();
+
+                // selectedDecorations에서 제공하는 스킬을 합산
+                for (Decoration decoration : selectedDecorations) {
+                    for (Skill.Rank skill : decoration.getSkills()) {
+                        totalSkills.put(skill.getSkillName(), totalSkills.getOrDefault(skill.getSkillName(), 0) + skill.getLevel());
+                    }
+                }
+
+                // selectedArmors에서 제공하는 스킬을 합산
+                for (Armor armor : selectedArmors) {
+                    if (armor != null) {
+                        for (Skill.Rank skill : armor.getSkills()) {
+                            totalSkills.put(skill.getSkillName(), totalSkills.getOrDefault(skill.getSkillName(), 0) + skill.getLevel());
+                        }
+                    }
+                }
+                totalSkills.put(charm.getRanks().get(0).getSkills().get(0).getSkillName(), totalSkills.getOrDefault(charm.getRanks().get(0).getSkills().get(0).getSkillName(), 0) + charmSkillLevel);
+
+
+                // 합산된 스킬 목록을 resultText에 추가
+                resultText.append("Total Skills: \n");
+                for (Map.Entry<String, Integer> entry : totalSkills.entrySet()) {
+                    resultText.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                }
+
+                // resultView에 결과 출력
+                resultView.setText(resultText.toString());  // resultText를 String으로 변환하여 출력
+                targetSkills = inputSkills;
+                return;
             }
         }
     }
@@ -731,6 +809,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
                 filteredDecorations.add(decoration);
             }
         }
+        filteredDecorations.sort((d1, d2) -> Integer.compare(d2.getSlot(), d1.getSlot()));
         return filteredDecorations;
     }
 
@@ -819,6 +898,58 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         }
         return selectedArmor;
     }
+
+    private Armor[] createArmorSet(List<Armor> headArmors, List<Armor> chestArmors, List<Armor> glovesArmors, List<Armor> waistArmors, List<Armor> legsArmors, int slotMin, int slotMax){
+        // Armor 배열: 0=head, 1=chest, 2=gloves, 3=waist, 4=legs
+        Armor[] selectedArmors = new Armor[5];
+        boolean[] checkSelected = {false, false, false, false, false};  //아무 장비도 선택되지 않았으므로 다 false
+
+        List<Pair<Armor, Integer>> filteredHead = filteringHeads(headArmors, slotMin, slotMax);     //시리즈 입력이 없을때의 상황으로 일단 진행
+        List<Pair<Armor, Integer>> filteredChest = filteringChests(chestArmors, slotMin, slotMax);
+        List<Pair<Armor, Integer>> filteredGloves = filteringGloves(glovesArmors, slotMin, slotMax);
+        List<Pair<Armor, Integer>> filteredWaist = filteringWaists(waistArmors, slotMin, slotMax);
+        List<Pair<Armor, Integer>> filteredLegs = filteringLegs(legsArmors, slotMin, slotMax);
+
+        for (int i = 0; i < 5; i++){
+            Armor selectedArmor = chooseArmor(filteredHead, filteredChest, filteredGloves, filteredWaist, filteredLegs, checkSelected);
+            // 2. 선택된 장비의 부위 인덱스에 저장
+            switch (selectedArmor.getType()) {
+                case "head":
+                    if (selectedArmors[0] == null)
+                        selectedArmors[0] = selectedArmor;
+                    checkSelected[0] = true;
+                    break;
+                case "chest":
+                    if (selectedArmors[1] == null)
+                        selectedArmors[1] = selectedArmor;
+                    checkSelected[1] = true;
+                    break;
+                case "gloves":
+                    if (selectedArmors[2] == null)
+                        selectedArmors[2] = selectedArmor;
+                    checkSelected[2] = true;
+                    break;
+                case "waist":
+                    if (selectedArmors[3] == null)
+                        selectedArmors[3] = selectedArmor;
+                    checkSelected[3] = true;
+                    break;
+                case "legs":
+                    if (selectedArmors[4] == null)
+                        selectedArmors[4] = selectedArmor;
+                    checkSelected[4] = true;
+                    break;
+            }
+            updateTargetSkills(selectedArmor);
+            // 4. 해당 부위 필터링 리스트 재평가
+            if (selectedArmors[0] == null) filteredHead = filteringHeads(headArmors, slotMin, slotMax);
+            if (selectedArmors[1] == null) filteredChest = filteringChests(chestArmors, slotMin, slotMax);
+            if (selectedArmors[2] == null) filteredGloves = filteringGloves(glovesArmors, slotMin, slotMax);
+            if (selectedArmors[3] == null) filteredWaist = filteringWaists(waistArmors, slotMin, slotMax);
+            if (selectedArmors[4] == null) filteredLegs = filteringLegs(legsArmors, slotMin, slotMax);
+        }
+        return selectedArmors;
+    }
     // 장비에 달린 스킬 점수화
     private int calculateSkillScore(Armor armor) {
         int skillScore = 0;
@@ -873,6 +1004,24 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             }
         }
         targetSkills.removeAll(skillsToRemove);
+    }
+
+    private void updateTargetSkillsbyName(String skillName, int skillLevel){
+        for (int j = 0; j < targetSkills.size(); j++) {
+            Pair<String, Integer> targetSkill = targetSkills.get(j);
+            if (targetSkill.first.equals(skillName)) {
+                int remainingLevel = targetSkill.second - skillLevel;
+
+                // 레벨 갱신
+                if (remainingLevel > 0) {
+                    targetSkills.set(j, new Pair<>(skillName, remainingLevel));  // 갱신
+                } else {
+                    targetSkills.remove(j);  // 해당 스킬이 충족되면 제거
+                    j--;  // 요소를 제거했으므로 인덱스 하나 줄이기
+                }
+                break;
+            }
+        }
     }
     // Weapon 슬롯 값을 정수 배열로 파싱
     private int[] parseSlotValues(String slotText) {
