@@ -130,7 +130,10 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                targetSkills = inputSkills;
+                targetSkills.clear();
+                for (Pair<String, Integer> pair : inputSkills) {
+                    targetSkills.add(new Pair<>(pair.first, pair.second));
+                }
                 searchArmors();
             }
         });
@@ -639,27 +642,30 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             int charmSkillLevel = charmPair.second;
             for (Skill.Rank charmRank : charm.getRanks().get(0).getSkills()) {
                 String charmSkillName = charmRank.getSkillName();
-                // targetSkills를 순회하면서 charmSkillName과 같은 이름의 스킬을 찾기
-                for (Pair<String, Integer> targetSkillPair : targetSkills) {
-                    int i = 0;
+
+                // 인덱스를 사용해 targetSkills를 순회
+                for (int i = 0; i < targetSkills.size(); i++) {
+                    Pair<String, Integer> targetSkillPair = targetSkills.get(i);
                     String targetSkillName = targetSkillPair.first;
                     int targetSkillLevel = targetSkillPair.second;
+
                     // 스킬 이름이 같으면, targetSkills의 스킬 레벨에서 charmSkillLevel만큼 빼기
                     if (charmSkillName.equals(targetSkillName)) {
-                        int newSkillLevel = targetSkillLevel - charmSkillLevel;
-                        // 레벨이 0 이상인 경우만 수정, 0보다 작아지면 제거할 수 있습니다.
+                        int newSkillLevel = targetSkillLevel - charmSkillLevel; // charmRank에서 제공하는 레벨
                         if (newSkillLevel > 0) {
+                            // 레벨이 남아 있으면 갱신
                             targetSkills.set(i, new Pair<>(targetSkillName, newSkillLevel));
                         } else {
-                           targetSkills.remove(targetSkillPair);
-                           i--;
+                            // 스킬이 완전히 충족되었으면 리스트에서 제거
+                            targetSkills.remove(i);
+                            i--; // 제거 후 인덱스 조정
                         }
                     }
-                    i++;
                 }
             }
 
-            for (int slotSize = 1; slotSize <= 4; slotSize++) {  // 작은 슬롯부터 큰 슬롯까지 순회
+
+            for (int slotSize = 4; slotSize >= 1; slotSize--) {  // 작은 슬롯부터 큰 슬롯까지 순회
                 int availableSlots = decorationSlots.getOrDefault(slotSize, 0);  // 현재 슬롯 크기의 가용 슬롯 수
 
                 for (int i = 0; i < availableSlots; i++) {  // 슬롯의 갯수만큼 순회
@@ -745,8 +751,13 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
                 // resultView에 결과 출력
                 resultView.setText(resultText.toString());  // resultText를 String으로 변환하여 출력
-                targetSkills = inputSkills;
+                for (Pair<String, Integer> pair : inputSkills) {
+                    targetSkills.add(new Pair<>(pair.first, pair.second));
+                }
                 return;
+            }
+            for (Pair<String, Integer> pair : inputSkills) {
+                targetSkills.add(new Pair<>(pair.first, pair.second));
             }
         }
     }
