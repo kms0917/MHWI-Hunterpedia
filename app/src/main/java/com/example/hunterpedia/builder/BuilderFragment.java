@@ -106,6 +106,8 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         searchBtn = view.findViewById(R.id.search);
         resultView = view.findViewById(R.id.testresult);
 
+        targetSkillView.setText("Selected Skills:");
+
         getSkillData();
         initializeWeaponSlots();
 
@@ -604,7 +606,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             return;
         }
 
-// 2. 장식주 필터링: 필요한 스킬만 포함된 장식주 선택
         List<Decoration> filteredDecorations = filteringDeorations();
 
         int slotMin = 4;
