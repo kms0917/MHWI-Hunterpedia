@@ -16,16 +16,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import android.util.Pair;
 
@@ -41,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BuilderFragment extends Fragment implements OnSkillSelectedListener {
+public class BuilderActivity extends AppCompatActivity implements OnSkillSelectedListener {
 
     private Spinner weaponSpinner;
     private List<String> weaponSlots;
@@ -95,23 +93,24 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
     }
 
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.builder_fragment, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.builder_activity); // 레이아웃 파일 설정
 
-        weaponSpinner = view.findViewById(R.id.weaponspinner);
-        expandableListView = view.findViewById(R.id.expandableListView);
-        targetSkillView = view.findViewById(R.id.targetSkill);
-        searchBtn = view.findViewById(R.id.search);
-        resultView = view.findViewById(R.id.testresult);
+
+        weaponSpinner = findViewById(R.id.weaponspinner);
+        expandableListView = findViewById(R.id.expandableListView);
+        targetSkillView = findViewById(R.id.targetSkill);
+        searchBtn = findViewById(R.id.search);
+        resultView = findViewById(R.id.testresult);
 
         targetSkillView.setText("Selected Skills:");
 
         getSkillData();
         initializeWeaponSlots();
 
-        ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(requireContext(),
+        ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, weaponSlots);
         weaponAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         weaponSpinner.setAdapter(weaponAdapter);
@@ -121,7 +120,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedWeapon = weaponSlots.get(position);
                 int[] slotValues = parseSlotValues(selectedWeapon);
-                Toast.makeText(requireContext(), "Weapon Slots: " + slotValues[0] + ", " + slotValues[1] + ", " + slotValues[2], Toast.LENGTH_SHORT).show();
+                Toast.makeText(BuilderActivity.this, "Weapon Slots: " + slotValues[0] + ", " + slotValues[1] + ", " + slotValues[2], Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -142,7 +141,6 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
 
         weaponSpinner.setSelection(0);
         getData();
-        return view;
     }
 
     // Weapon Spinner 데이터 초기화
@@ -424,7 +422,7 @@ public class BuilderFragment extends Fragment implements OnSkillSelectedListener
         groupSkillsMap.put(groupList.get(10), gunnerSkills);
         groupSkillsMap.put(groupList.get(11), othersSkills);
 
-        ExpandableListAdapter expandableListAdapter = new SkillListAdapter(requireContext(), groupList, groupSkillsMap, this);
+        ExpandableListAdapter expandableListAdapter = new SkillListAdapter(BuilderActivity.this, groupList, groupSkillsMap, this);
         expandableListView.setAdapter(expandableListAdapter);
     }
 

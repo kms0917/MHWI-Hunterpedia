@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.view.View;
 
-import com.example.hunterpedia.builder.ArmorBuilder;
+import com.example.hunterpedia.builder.BuilderActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         goToArmorBuilderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ArmorBuilder.class);
+                Intent intent = new Intent(MainActivity.this, BuilderActivity.class);
                 startActivity(intent);
             }
         });

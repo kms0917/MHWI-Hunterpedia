@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".builder.ArmorBuilder" />
+        <activity android:name=".builder.BuilderActivity" />
     </application>
 
 </manifest>
