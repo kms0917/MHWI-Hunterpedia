@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.monster;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hunterpedia.R;
 import com.example.hunterpedia.api.ApiClient;
 import com.example.hunterpedia.api.ApiService;
 import com.example.hunterpedia.datastructure.Ailment;
 import com.example.hunterpedia.datastructure.Location;
 import com.example.hunterpedia.datastructure.Monster;
 import com.example.hunterpedia.datastructure.MonsterResistance;
-import com.example.hunterpedia.datastructure.MonsterReward;
 import com.example.hunterpedia.datastructure.MonsterWeakness;
 
 import java.util.ArrayList;

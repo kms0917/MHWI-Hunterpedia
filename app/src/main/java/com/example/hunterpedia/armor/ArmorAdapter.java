@@ -1,4 +1,4 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.armor;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hunterpedia.R;
 import com.example.hunterpedia.datastructure.Armor;
 import com.example.hunterpedia.datastructure.Skill;
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- 무기 이미지 -->
+    <ImageView
+        android:id="@+id/weaponImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:contentDescription="Weapon Image"
+        android:scaleType="fitCenter" />
+
+    <!-- 무기 정보 레이아웃 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+
+        <!-- 무기 이름 -->
+        <TextView
+            android:id="@+id/weaponName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weapon Name"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <!-- 무기 타입 -->
+        <TextView
+            android:id="@+id/weaponType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weapon Type" />
+
+        <!-- 무기 희귀도 -->
+        <TextView
+            android:id="@+id/weaponRarity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rarity" />
+
+        <!-- 무기 공격력 -->
+        <TextView
+            android:id="@+id/weaponAttack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attack: 0" />
+
+        <!-- 무기 슬롯 -->
+        <TextView
+            android:id="@+id/weaponSlots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slots: None" />
+
+        <!-- 무기 속성 -->
+        <TextView
+            android:id="@+id/weaponElements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Element: None" />
+    </LinearLayout>
+</LinearLayout>

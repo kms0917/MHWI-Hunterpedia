@@ -28,10 +28,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".builder.BuilderActivity" />
-        <activity android:name=".MonsterGridActivity" />
-        <activity android:name=".MonsterDetailActivity" />
-        <activity android:name=".SkillActivity" />
-        <activity android:name=".ArmorActivity" />
+        <activity android:name=".monster.MonsterGridActivity" />
+        <activity android:name=".monster.MonsterDetailActivity" />
+        <activity android:name=".skill.SkillActivity" />
+        <activity android:name=".armor.ArmorActivity" />
+        <activity android:name=".weapon.WeaponActivity" />
     </application>
 
 </manifest>

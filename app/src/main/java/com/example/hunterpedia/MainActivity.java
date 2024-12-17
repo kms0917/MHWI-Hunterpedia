@@ -2,24 +2,16 @@ package com.example.hunterpedia;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.hunterpedia.api.ApiClient;
-import com.example.hunterpedia.api.ApiService;
+import com.example.hunterpedia.armor.ArmorActivity;
 import com.example.hunterpedia.builder.BuilderActivity;
-import com.example.hunterpedia.datastructure.Monster;
-import com.example.hunterpedia.datastructure.MonsterWeakness;
-import com.example.hunterpedia.datastructure.Skill;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.hunterpedia.monster.MonsterGridActivity;
+import com.example.hunterpedia.skill.SkillActivity;
+import com.example.hunterpedia.weapon.WeaponActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,6 +52,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ArmorActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button goToWeaponButton = findViewById(R.id.weaponbtn);
+        goToWeaponButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, WeaponActivity.class);
                 startActivity(intent);
             }
         });

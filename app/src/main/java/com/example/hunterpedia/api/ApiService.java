@@ -5,6 +5,7 @@ import com.example.hunterpedia.datastructure.Charm;
 import com.example.hunterpedia.datastructure.Decoration;
 import com.example.hunterpedia.datastructure.Monster;
 import com.example.hunterpedia.datastructure.Skill;
+import com.example.hunterpedia.datastructure.Weapon;
 
 import java.util.List;
 
@@ -46,4 +47,7 @@ public interface ApiService {
 
     @GET("monsters")
     Call<List<Monster>> getAllMonsters();
+
+    @GET("weapons")
+    Call<List<Weapon>> getAllWeapons();
 }

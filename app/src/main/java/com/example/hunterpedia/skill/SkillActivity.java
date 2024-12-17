@@ -1,16 +1,18 @@
-package com.example.hunterpedia;
+package com.example.hunterpedia.skill;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import androidx.appcompat.widget.SearchView;
+
+import com.example.hunterpedia.R;
 import com.example.hunterpedia.api.ApiClient;
 import com.example.hunterpedia.api.ApiService;
-import com.example.hunterpedia.datastructure.Armor;
+import com.example.hunterpedia.datastructure.Skill;
 
 import java.util.List;
 
@@ -18,46 +20,44 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ArmorActivity extends AppCompatActivity {
+public class SkillActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private ArmorAdapter armorAdapter;
+    private SkillAdapter skillAdapter;
     private SearchView searchView;
-
-    private static final String TAG = "ArmorActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_armor);
+        setContentView(R.layout.activity_skill);
 
-        recyclerView = findViewById(R.id.armorRecyclerView);
-        searchView = findViewById(R.id.armorSearchView);
+        recyclerView = findViewById(R.id.skillRecyclerView);
+        searchView = findViewById(R.id.skillSearchView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        fetchArmors();
+        fetchSkills();
         setupSearchView();
     }
 
-    private void fetchArmors() {
+    private void fetchSkills() {
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
-        Call<List<Armor>> call = apiService.getMasterArmors(); // 마스터 랭크 방어구 가져오기
+        Call<List<Skill>> call = apiService.getSkills();
 
-        call.enqueue(new Callback<List<Armor>>() {
+        call.enqueue(new Callback<List<Skill>>() {
             @Override
-            public void onResponse(Call<List<Armor>> call, Response<List<Armor>> response) {
+            public void onResponse(Call<List<Skill>> call, Response<List<Skill>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Armor> armorList = response.body();
-                    armorAdapter = new ArmorAdapter(armorList);
-                    recyclerView.setAdapter(armorAdapter);
+                    List<Skill> skillList = response.body();
+                    skillAdapter = new SkillAdapter(skillList);
+                    recyclerView.setAdapter(skillAdapter);
                 } else {
-                    Log.e(TAG, "Failed to fetch armors.");
+                    Log.e("SkillActivity", "Failed to fetch skills.");
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Armor>> call, Throwable t) {
-                Log.e(TAG, "Error: " + t.getMessage());
+            public void onFailure(Call<List<Skill>> call, Throwable t) {
+                Log.e("SkillActivity", "Error: " + t.getMessage());
             }
         });
     }
@@ -66,13 +66,13 @@ public class ArmorActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false; // Enter 키 동작은 필요 없음
+                return false; // Enter 키를 누른 경우 처리
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (armorAdapter != null) {
-                    armorAdapter.filter(newText); // 입력값에 따라 필터링
+                if (skillAdapter != null) {
+                    skillAdapter.filter(newText); // 입력값에 따라 필터링
                 }
                 return true;
             }
