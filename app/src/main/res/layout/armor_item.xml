@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@android:color/white">
+
+    <!-- 방어구 이름 -->
+    <TextView
+        android:id="@+id/armorName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Armor Name"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- 방어구 타입 및 랭크 -->
+    <TextView
+        android:id="@+id/armorTypeRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type, Rank" />
+
+    <!-- 방어력 -->
+    <TextView
+        android:id="@+id/armorDefense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Defense" />
+
+    <!-- 슬롯 -->
+    <TextView
+        android:id="@+id/armorSlots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Slots" />
+
+    <!-- 스킬 -->
+    <TextView
+        android:id="@+id/armorSkills"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skills" />
+</LinearLayout>

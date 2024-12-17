@@ -31,6 +31,7 @@
         <activity android:name=".MonsterGridActivity" />
         <activity android:name=".MonsterDetailActivity" />
         <activity android:name=".SkillActivity" />
+        <activity android:name=".ArmorActivity" />
     </application>
 
 </manifest>

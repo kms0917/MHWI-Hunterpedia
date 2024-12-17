@@ -54,5 +54,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button goToArmorButton = findViewById(R.id.armorbtn);
+        goToArmorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ArmorActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
