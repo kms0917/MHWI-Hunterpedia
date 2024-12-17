@@ -178,7 +178,7 @@ public class MonsterGridActivity extends AppCompatActivity {
             ArrayList<String> resistanceList = new ArrayList<>();
             if (selectedMonster.getResistances() != null) {
                 for (MonsterResistance resistance : selectedMonster.getResistances()) {
-                    String resistanceInfo = "Element: " + resistance.getElement();
+                    String resistanceInfo = resistance.getElement();
                     resistanceList.add(resistanceInfo);
                 }
             }
@@ -188,7 +188,7 @@ public class MonsterGridActivity extends AppCompatActivity {
             ArrayList<String> weaknessList = new ArrayList<>();
             if (selectedMonster.getWeaknesses() != null) {
                 for (MonsterWeakness weakness : selectedMonster.getWeaknesses()) {
-                    String weaknessInfo = "Element: " + weakness.getElement() + " (Stars: " + weakness.getStars() + ")";
+                    String weaknessInfo = weakness.getElement() + " (Stars: " + weakness.getStars() + ")";
                     weaknessList.add(weaknessInfo);
                 }
             }

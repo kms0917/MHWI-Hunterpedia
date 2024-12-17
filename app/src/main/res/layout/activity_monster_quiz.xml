@@ -37,15 +37,6 @@
             android:layout_gravity="center"
             android:contentDescription="Monster Icon" />
 
-        <!-- 몬스터 설명 -->
-        <TextView
-            android:id="@+id/monsterDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Description"
-            android:textSize="16sp"
-            android:layout_marginTop="10dp" />
-
         <!-- 선택지 버튼 -->
         <LinearLayout
             android:id="@+id/optionsLayout"

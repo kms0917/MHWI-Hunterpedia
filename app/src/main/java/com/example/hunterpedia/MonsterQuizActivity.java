@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class MonsterQuizActivity extends AppCompatActivity {
 
-    private TextView timerTextView, monsterDescription, scoreTextView, loadingTextView, feedbackTextView;
+    private TextView timerTextView, scoreTextView, loadingTextView;
     private ImageView monsterIcon;
     private LinearLayout optionsLayout, endGameLayout, quizLayout;
     private ProgressBar loadingProgressBar;
@@ -47,7 +47,6 @@ public class MonsterQuizActivity extends AppCompatActivity {
         // View 초기화
         timerTextView = findViewById(R.id.timerTextView);
         monsterIcon = findViewById(R.id.monsterIcon);
-        monsterDescription = findViewById(R.id.monsterDescription);
         optionsLayout = findViewById(R.id.optionsLayout);
         scoreTextView = findViewById(R.id.scoreTextView);
         endGameLayout = findViewById(R.id.endGameLayout);
@@ -106,18 +105,10 @@ public class MonsterQuizActivity extends AppCompatActivity {
     }
 
     private void loadMonsterQuizUI() {
-        boolean showIcon = Math.random() > 0.5;
 
-        if (showIcon) {
-            int imageResource = getResources().getIdentifier("_" + correctMonster.getId(), "drawable", getPackageName());
-            if (imageResource != 0) {
-                monsterIcon.setImageResource(imageResource);
-            }
-            monsterDescription.setText("");
-        } else {
-            monsterIcon.setImageResource(0);
-            monsterDescription.setText("Species: " + correctMonster.getSpecies() +
-                    "\nDescription: " + correctMonster.getDescription());
+        int imageResource = getResources().getIdentifier("_" + correctMonster.getId(), "drawable", getPackageName());
+        if (imageResource != 0) {
+            monsterIcon.setImageResource(imageResource);
         }
 
         List<Monster> options = new ArrayList<>(monsterList.subList(0, 4));

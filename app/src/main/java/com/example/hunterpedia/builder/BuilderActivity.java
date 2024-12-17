@@ -2,6 +2,7 @@ package com.example.hunterpedia.builder;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -130,18 +131,18 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         Map<String, List<SelectedSkill>> groupSkillsMap = new HashMap<>();
 
         // 그룹 항목 추가
-        groupList.add("공격력 상승");
-        groupList.add("방어 계열");
-        groupList.add("회심률 계열");
-        groupList.add("속성/상태이상 강화 계열");
-        groupList.add("스태미나 계열");
-        groupList.add("예리도 계열");
-        groupList.add("속성/상태이상 내성");
-        groupList.add("회피/가드 계열");
-        groupList.add("아이템 사용 계열");
-        groupList.add("전투 보조 계열");
-        groupList.add("건너 전용");
-        groupList.add("기타 성능 강화");
+        groupList.add("Attack");
+        groupList.add("Defence");
+        groupList.add("Critical");
+        groupList.add("Elemental/Ailment");
+        groupList.add("Stamina");
+        groupList.add("Sharpness");
+        groupList.add("Resistance");
+        groupList.add("Evade/Guard");
+        groupList.add("Item");
+        groupList.add("Combat Assistance");
+        groupList.add("Gunner");
+        groupList.add("Other Enhancements");
 
         List<SelectedSkill> attackSkills = new ArrayList<>();
         List<SelectedSkill> defenceSkills = new ArrayList<>();
@@ -547,12 +548,17 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             prevScore = armorPair.second;
 
             Armor armor = armorPair.first;
-            results.add("Name: " + armor.getName() +
-                    "\nSkills: " + getSkillDescription(armor) +
-                    "\nSlots: " + getSlotDescription(armor));
+
+            // HTML 형식을 이용해 'Name'을 강조체로 설정하고, 나머지는 일반 텍스트로 설정
+            String formattedText = "<font color='#0000FF'><b style='font-size:24sp;'>Name: " + armor.getName() + "</b></font>" +
+                    "<br>Skills: " + getSkillDescription(armor) +
+                    "<br>Slots: " + getSlotDescription(armor);
+
+            results.add(formattedText);
         }
         return results;
     }
+
 
 
     private String getSkillDescription(Armor armor) {
@@ -577,9 +583,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         for (Armor armor : headArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            if (withDeco){
-                score += calculateSlotScore(armor, slotMin, slotMax);
-            }
+            score += calculateSlotScore(armor, slotMin, slotMax, withDeco);
             filteredHead.add(new Pair<> (armor, score));
         }
         filteredHead.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
@@ -591,9 +595,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         for (Armor armor : chestArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            if (withDeco){
-                score += calculateSlotScore(armor, slotMin, slotMax);
-            }
+            score += calculateSlotScore(armor, slotMin, slotMax, withDeco);
             filteredChest.add(new Pair<> (armor, score));
         }
         filteredChest.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
@@ -605,9 +607,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         for (Armor armor : glovesArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            if (withDeco){
-                score += calculateSlotScore(armor, slotMin, slotMax);
-            }
+            score += calculateSlotScore(armor, slotMin, slotMax, withDeco);
             filteredGloves.add(new Pair<> (armor, score));
         }
         filteredGloves.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
@@ -619,9 +619,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         for (Armor armor : waistArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            if (withDeco){
-                score += calculateSlotScore(armor, slotMin, slotMax);
-            }
+            score += calculateSlotScore(armor, slotMin, slotMax, withDeco);
             filteredWaist.add(new Pair<> (armor, score));
         }
         filteredWaist.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
@@ -633,9 +631,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         for (Armor armor : legsArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            if (withDeco){
-                score += calculateSlotScore(armor, slotMin, slotMax);
-            }
+            score += calculateSlotScore(armor, slotMin, slotMax, withDeco);
             filteredLegs.add(new Pair<> (armor, score));
         }
         filteredLegs.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
@@ -662,11 +658,11 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         return skillScore;
     }
     // 장비의 슬롯 크기 점수화
-    private int calculateSlotScore(Armor armor, int slotMin, int slotMax) {
+    private int calculateSlotScore(Armor armor, int slotMin, int slotMax, boolean withDeco) {
         int slotScore = 0;
         // 4레벨 슬롯은 무조건 +2점
         for (Armor.Slot slot : armor.getSlots()) {
-            if (slot.getRank() == 4 && slotMax == 4) {
+            if (slot.getRank() == 4 && slotMax == 4 && withDeco) {
                 slotScore += 2;
             }
             else if (slot.getRank() >= slotMin) {
@@ -758,7 +754,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                 convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
             }
             TextView textView = convertView.findViewById(android.R.id.text1);
-            textView.setText(childText);
+            textView.setText(Html.fromHtml(childText));
             return convertView;
         }
 

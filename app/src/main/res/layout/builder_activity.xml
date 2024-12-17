@@ -18,7 +18,7 @@
 
             <android.widget.ExpandableListView
                 android:id="@+id/expandableListView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="355dp"
                 android:nestedScrollingEnabled="true"
                 android:rotationY="0"
