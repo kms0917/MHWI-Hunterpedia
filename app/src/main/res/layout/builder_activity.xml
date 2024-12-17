@@ -1,99 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/weaponslot"
-        android:layout_width="414dp"
-        android:layout_height="43dp"
-        android:background="#FFFFFF"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="94dp"
-            android:layout_height="37dp"
-            android:background="#FFFFFF"
-            android:text="무기 슬롯"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Spinner
-            android:id="@+id/weaponspinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:background="@android:drawable/btn_dropdown"
-            app:layout_constraintStart_toEndOf="@+id/textView"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:layout_width="412dp"
-        android:layout_height="688dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/weaponslot"
-        tools:layout_editor_absoluteX="1dp">
-
-        <android.widget.ExpandableListView
-            android:id="@+id/expandableListView"
-            android:layout_width="wrap_content"
-            android:layout_height="355dp"
-            android:nestedScrollingEnabled="true"
-            android:rotationY="0"
-            android:scaleY="1" />
+        android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/targetview"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="#41E0FA"
-            android:orientation="horizontal">
+            android:layout_width="412dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="1dp">
 
-            <ScrollView
+            <android.widget.ExpandableListView
+                android:id="@+id/expandableListView"
+                android:layout_width="wrap_content"
+                android:layout_height="355dp"
+                android:nestedScrollingEnabled="true"
+                android:rotationY="0"
+                android:scaleY="1" />
+
+            <LinearLayout
+                android:id="@+id/targetview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_height="52dp"
+                android:background="#41E0FA"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/targetSkill"
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    tools:text="Selected Skills:" />
-            </ScrollView>
+                    android:layout_weight="1">
 
-            <Button
-                android:id="@+id/search"
+                    <TextView
+                        android:id="@+id/targetSkill"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        tools:text="Selected Skills:" />
+                </ScrollView>
+
+                <Button
+                    android:id="@+id/search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="Search"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+            <ExpandableListView
+                android:id="@+id/resultExpandableList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text="Search"
-                android:visibility="invisible" />
-
+                android:layout_height="match_parent" />
         </LinearLayout>
-
-        <ScrollView
-            android:id="@+id/resultView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/testresult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </ScrollView>
-
-    </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- 로딩 화면 -->

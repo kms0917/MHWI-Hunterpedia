@@ -1,5 +1,6 @@
 package com.example.hunterpedia.builder;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -42,8 +44,6 @@ import retrofit2.Response;
 
 public class BuilderActivity extends AppCompatActivity implements OnSkillSelectedListener {
 
-    private Spinner weaponSpinner;
-    private List<String> weaponSlots;
     private ExpandableListView expandableListView;
     private TextView targetSkillView;
     private Button searchBtn;
@@ -57,9 +57,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
     private List<Armor> glovesArmors;
     private List<Armor> waistArmors;
     private List<Armor> legsArmors;
-    private List<Decoration> decorations;
-    private List<Charm> charms;
-    private int totalApiCalls = 7; // API 호출 개수
+    private int totalApiCalls = 6; // API 호출 개수
     private int completedApiCalls = 0; // 완료된 API 호출 개수
 
     @Override
@@ -102,38 +100,15 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.builder_activity); // 레이아웃 파일 설정
 
-
-        weaponSpinner = findViewById(R.id.weaponspinner);
         expandableListView = findViewById(R.id.expandableListView);
         targetSkillView = findViewById(R.id.targetSkill);
         searchBtn = findViewById(R.id.search);
-        resultView = findViewById(R.id.testresult);
         loadingLayout = findViewById(R.id.loadingLayout);
 
         showLoadingScreen(true); // 로딩 화면 표시
         targetSkillView.setText("Selected Skills:");
 
         getSkillData();
-        initializeWeaponSlots();
-
-        ArrayAdapter<String> weaponAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, weaponSlots);
-        weaponAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        weaponSpinner.setAdapter(weaponAdapter);
-
-        weaponSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedWeapon = weaponSlots.get(position);
-                int[] slotValues = parseSlotValues(selectedWeapon);
-                Toast.makeText(BuilderActivity.this, "Weapon Slots: " + slotValues[0] + ", " + slotValues[1] + ", " + slotValues[2], Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,49 +120,9 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             }
         });
 
-        weaponSpinner.setSelection(0);
         getData();
     }
 
-    // Weapon Spinner 데이터 초기화
-    private void initializeWeaponSlots() {
-        weaponSlots = new ArrayList<>();
-        weaponSlots.add("없음");
-        weaponSlots.add("1");
-        weaponSlots.add("1, 1");
-        weaponSlots.add("1, 1, 1");
-        weaponSlots.add("2");
-        weaponSlots.add("2, 1");
-        weaponSlots.add("2, 2");
-        weaponSlots.add("2, 1, 1");
-        weaponSlots.add("2, 2, 1");
-        weaponSlots.add("2, 2, 2");
-        weaponSlots.add("3");
-        weaponSlots.add("3, 1");
-        weaponSlots.add("3, 2");
-        weaponSlots.add("3, 3");
-        weaponSlots.add("3, 1, 1");
-        weaponSlots.add("3, 2, 1");
-        weaponSlots.add("3, 2, 2");
-        weaponSlots.add("3, 3, 1");
-        weaponSlots.add("3, 3, 2");
-        weaponSlots.add("3, 3, 3");
-        weaponSlots.add("4");
-        weaponSlots.add("4, 1");
-        weaponSlots.add("4, 2");
-        weaponSlots.add("4, 3");
-        weaponSlots.add("4, 4");
-        weaponSlots.add("4, 1, 1");
-        weaponSlots.add("4, 2, 1");
-        weaponSlots.add("4, 2, 2");
-        weaponSlots.add("4, 3, 1");
-        weaponSlots.add("4, 3, 2");
-        weaponSlots.add("4, 3, 3");
-        weaponSlots.add("4, 4, 1");
-        weaponSlots.add("4, 4, 2");
-        weaponSlots.add("4, 4, 3");
-        weaponSlots.add("4, 4, 4");
-    }
 
     // ExpandableListView 데이터 초기화
     private void initializeSkillList() {
@@ -445,6 +380,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     // 받은 스킬 데이터를 처리하는 코드 작성
                     Log.d("ArmorBuilder", "Skills loaded: " + skills.size());
                     initializeSkillList();
+                    checkAllApiCompleted();
                 } else {
                     // API 호출이 실패한 경우
                     Log.e("ArmorBuilder", "Failed to load skills.");
@@ -455,6 +391,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             public void onFailure(@NonNull Call<List<Skill>> call, @NonNull Throwable t) {
                 // 네트워크 오류 등으로 실패한 경우
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
     }
@@ -570,51 +507,6 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                 checkAllApiCompleted();
             }
         });
-
-        Call<List<Decoration>> call2 = apiService.getDecorations();
-
-        call2.enqueue(new Callback<List<Decoration>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Decoration>> call, @NonNull Response<List<Decoration>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    decorations = response.body();
-                    Log.d("ArmorBuilder", "Decorations loaded: " + decorations.size());
-                    checkAllApiCompleted();
-                } else {
-                    // API 호출이 실패한 경우
-                    Log.e("ArmorBuilder", "Failed to load Decorations.");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Decoration>> call, @NonNull Throwable t) {
-                Log.e("ArmorBuilder", "Error: " + t.getMessage());
-                checkAllApiCompleted();
-            }
-        });
-
-        Call<List<Charm>> call3 = apiService.getCharms();
-
-        call3.enqueue(new Callback<List<Charm>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Charm>> call, @NonNull Response<List<Charm>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    charms = response.body();
-                    Log.d("ArmorBuilder", "Charms loaded: " + charms.size());
-                    searchBtn.setVisibility(View.VISIBLE);
-                    checkAllApiCompleted();
-                } else {
-                    // API 호출이 실패한 경우
-                    Log.e("ArmorBuilder", "Failed to load Charms.");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Charm>> call, @NonNull Throwable t) {
-                Log.e("ArmorBuilder", "Error: " + t.getMessage());
-                checkAllApiCompleted();
-            }
-        });
     }
 
     private void checkAllApiCompleted() {
@@ -625,50 +517,55 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
     }
 
     private void searchArmors() {
-        // 기존 결과 초기화
-        resultView.setText("");
+        HashMap<String, List<String>> resultMap = new HashMap<>();
+        List<String> groupList = Arrays.asList("Head Armors", "Chest Armors", "Gloves Armors", "Waist Armors", "Legs Armors");
 
-        // 필터링된 장비 저장용 리스트
-        List<Pair<Armor, Integer>> filteredHeadArmors = filteringHeads(headArmors, 1, 4);
-        List<Pair<Armor, Integer>> filteredChestArmors = filteringChests(chestArmors, 1, 4);
-        List<Pair<Armor, Integer>> filteredGlovesArmors = filteringGloves(glovesArmors, 1, 4);
-        List<Pair<Armor, Integer>> filteredWaistArmors = filteringWaists(waistArmors, 1, 4);
-        List<Pair<Armor, Integer>> filteredLegsArmors = filteringLegs(legsArmors, 1, 4);
+        resultMap.put("Head Armors", formatArmorResults(filteringHeads(headArmors, 1, 4)));
+        resultMap.put("Chest Armors", formatArmorResults(filteringChests(chestArmors, 1, 4)));
+        resultMap.put("Gloves Armors", formatArmorResults(filteringGloves(glovesArmors, 1, 4)));
+        resultMap.put("Waist Armors", formatArmorResults(filteringWaists(waistArmors, 1, 4)));
+        resultMap.put("Legs Armors", formatArmorResults(filteringLegs(legsArmors, 1, 4)));
 
-        // 필터링된 장비를 출력
-        appendFilteredArmorsToResult("Filtered Head Armors", filteredHeadArmors);
-        appendFilteredArmorsToResult("Filtered Chest Armors", filteredChestArmors);
-        appendFilteredArmorsToResult("Filtered Gloves Armors", filteredGlovesArmors);
-        appendFilteredArmorsToResult("Filtered Waist Armors", filteredWaistArmors);
-        appendFilteredArmorsToResult("Filtered Legs Armors", filteredLegsArmors);
+        ExpandableListView resultListView = findViewById(R.id.resultExpandableList);
+        ExpandableListAdapter adapter = new CustomExpandableListAdapter(this, groupList, resultMap);
+        resultListView.setAdapter(adapter);
     }
 
-    // 필터링된 장비를 출력하는 헬퍼 함수
-    private void appendFilteredArmorsToResult(String title, List<Pair<Armor, Integer>> filteredArmors) {
-        resultView.append(title + ":\n");
 
-        if (filteredArmors.isEmpty()) {
-            resultView.append("No armors found.\n\n");
-            return;
-        }
+    private List<String> formatArmorResults(List<Pair<Armor, Integer>> filteredArmors) {
+        List<String> results = new ArrayList<>();
+        int prevScore = -1, count = 0;
 
         for (Pair<Armor, Integer> armorPair : filteredArmors) {
-            Armor armor = armorPair.first;
-            int score = armorPair.second;
+            if (count >= 2) break; // 상위 2개의 점수만 사용
+            if (armorPair.second != prevScore) count++; // 새로운 점수 감지
+            prevScore = armorPair.second;
 
-            resultView.append("Name: " + armor.getName() + "\n");
-            resultView.append("Score: " + score + "\n");
-            resultView.append("Skills: ");
-            for (Skill.Rank skill : armor.getSkills()) {
-                resultView.append(skill.getSkillName() + "(Lv" + skill.getLevel() + "), ");
-            }
-            resultView.append("\nSlots: ");
-            for (Armor.Slot slot : armor.getSlots()) {
-                resultView.append("Lv" + slot.getRank() + " ");
-            }
-            resultView.append("\n\n");
+            Armor armor = armorPair.first;
+            results.add("Name: " + armor.getName() +
+                    "\nSkills: " + getSkillDescription(armor) +
+                    "\nSlots: " + getSlotDescription(armor));
         }
+        return results;
     }
+
+
+    private String getSkillDescription(Armor armor) {
+        StringBuilder skills = new StringBuilder();
+        for (Skill.Rank skill : armor.getSkills()) {
+            skills.append(skill.getSkillName()).append("(Lv").append(skill.getLevel()).append("), ");
+        }
+        return skills.toString();
+    }
+
+    private String getSlotDescription(Armor armor) {
+        StringBuilder slots = new StringBuilder();
+        for (Armor.Slot slot : armor.getSlots()) {
+            slots.append("Lv").append(slot.getRank()).append(" ");
+        }
+        return slots.toString().trim();
+    }
+
 
     private List<Pair<Armor, Integer>> filteringHeads(List<Armor> headArmors, int slotMin, int slotMax){
         List<Pair<Armor, Integer>> filteredHead = new ArrayList<>();
@@ -773,40 +670,6 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         }
         return slotScore;
     }
-    //선택된 장비를 받아서 targetSkills 갱신
-    private void updateTargetSkills(Armor armor){
-        List<Pair<String, Integer>> skillsToRemove = new ArrayList<>();
-        for (Skill.Rank armorSkill : armor.getSkills()) {
-            for (int i = 0; i < targetSkills.size(); i++) {
-                Pair<String, Integer> targetSkill = targetSkills.get(i);
-                if (armorSkill.getSkillName().equals(targetSkill.first)) {
-                    int updatedLevel = targetSkill.second - armorSkill.getLevel();
-
-                    if (updatedLevel <= 0) {
-                        // 해당 targetSkill을 targetSkills에서 제거
-                        skillsToRemove.add(targetSkill);
-                    } else {
-                        // 새 Pair 객체로 값 업데이트
-                        targetSkills.set(i, new Pair<>(targetSkill.first, updatedLevel));
-                    }
-                    break;
-                }
-            }
-        }
-        targetSkills.removeAll(skillsToRemove);
-    }
-    // Weapon 슬롯 값을 정수 배열로 파싱
-    private int[] parseSlotValues(String slotText) {
-        if ("없음".equals(slotText)) {
-            return new int[]{0, 0, 0};
-        }
-        String[] parts = slotText.split(", ");
-        int[] slots = new int[3];
-        for (int i = 0; i < parts.length; i++) {
-            slots[i] = Integer.parseInt(parts[i]);
-        }
-        return slots;
-    }
 
     private List<String> createSkillOptions(int maxLevel) {
         List<String> options = new ArrayList<>();
@@ -824,5 +687,82 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             loadingLayout.setVisibility(View.GONE);
         }
     }
+
+    public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
+        private Context context;
+        private List<String> groupList;
+        private HashMap<String, List<String>> childMap;
+
+        public CustomExpandableListAdapter(Context context, List<String> groupList, HashMap<String, List<String>> childMap) {
+            this.context = context;
+            this.groupList = groupList;
+            this.childMap = childMap;
+        }
+
+        @Override
+        public int getGroupCount() {
+            return groupList.size();
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return childMap.get(groupList.get(groupPosition)).size();
+        }
+
+        @Override
+        public Object getGroup(int groupPosition) {
+            return groupList.get(groupPosition);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return childMap.get(groupList.get(groupPosition)).get(childPosition);
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return groupPosition;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return childPosition;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            String groupTitle = (String) getGroup(groupPosition);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+            }
+            TextView textView = convertView.findViewById(android.R.id.text1);
+            textView.setText(groupTitle);
+            return convertView;
+        }
+
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            String childText = (String) getChild(groupPosition, childPosition);
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
+            }
+            TextView textView = convertView.findViewById(android.R.id.text1);
+            textView.setText(childText);
+            return convertView;
+        }
+
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return false;
+        }
+    }
+
 
 }
