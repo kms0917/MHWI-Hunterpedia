@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
     private TextView targetSkillView;
     private Button searchBtn;
     private TextView resultView;
+    private LinearLayout loadingLayout;
     private ArrayList<Pair<String, Integer>> targetSkills = new ArrayList<>();
     private ArrayList<Pair<String, Integer>> inputSkills = new ArrayList<>();
     private List<Skill> skills;
@@ -57,6 +59,8 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
     private List<Armor> legsArmors;
     private List<Decoration> decorations;
     private List<Charm> charms;
+    private int totalApiCalls = 7; // API 호출 개수
+    private int completedApiCalls = 0; // 완료된 API 호출 개수
 
     @Override
     public void onSkillSelected(SelectedSkill skill, int selectedLevel) {
@@ -104,7 +108,9 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         targetSkillView = findViewById(R.id.targetSkill);
         searchBtn = findViewById(R.id.search);
         resultView = findViewById(R.id.testresult);
+        loadingLayout = findViewById(R.id.loadingLayout);
 
+        showLoadingScreen(true); // 로딩 화면 표시
         targetSkillView.setText("Selected Skills:");
 
         getSkillData();
@@ -464,6 +470,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     headArmors = response.body();
                     Collections.reverse(headArmors); // Optional: reverse list if needed
                     Log.d("ArmorBuilder", "Head armors loaded: " + headArmors.size());
+                    checkAllApiCompleted();
                 } else {
                     Log.e("ArmorBuilder", "Failed to load head armors.");
                 }
@@ -472,6 +479,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -484,6 +492,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     chestArmors = response.body();
                     Collections.reverse(chestArmors); // Optional: reverse list if needed
                     Log.d("ArmorBuilder", "Chest armors loaded: " + chestArmors.size());
+                    checkAllApiCompleted();
                 } else {
                     Log.e("ArmorBuilder", "Failed to load chest armors.");
                 }
@@ -492,6 +501,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -504,6 +514,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     glovesArmors = response.body();
                     Collections.reverse(glovesArmors); // Optional: reverse list if needed
                     Log.d("ArmorBuilder", "Gloves armors loaded: " + glovesArmors.size());
+                    checkAllApiCompleted();
                 } else {
                     Log.e("ArmorBuilder", "Failed to load gloves armors.");
                 }
@@ -512,6 +523,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -524,6 +536,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     waistArmors = response.body();
                     Collections.reverse(waistArmors); // Optional: reverse list if needed
                     Log.d("ArmorBuilder", "Waist armors loaded: " + waistArmors.size());
+                    checkAllApiCompleted();
                 } else {
                     Log.e("ArmorBuilder", "Failed to load waist armors.");
                 }
@@ -532,6 +545,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -544,6 +558,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     legsArmors = response.body();
                     Collections.reverse(legsArmors); // Optional: reverse list if needed
                     Log.d("ArmorBuilder", "Legs armors loaded: " + legsArmors.size());
+                    checkAllApiCompleted();
                 } else {
                     Log.e("ArmorBuilder", "Failed to load legs armors.");
                 }
@@ -552,6 +567,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Armor>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -563,6 +579,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                 if (response.isSuccessful() && response.body() != null) {
                     decorations = response.body();
                     Log.d("ArmorBuilder", "Decorations loaded: " + decorations.size());
+                    checkAllApiCompleted();
                 } else {
                     // API 호출이 실패한 경우
                     Log.e("ArmorBuilder", "Failed to load Decorations.");
@@ -572,6 +589,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Decoration>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
 
@@ -584,6 +602,7 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
                     charms = response.body();
                     Log.d("ArmorBuilder", "Charms loaded: " + charms.size());
                     searchBtn.setVisibility(View.VISIBLE);
+                    checkAllApiCompleted();
                 } else {
                     // API 호출이 실패한 경우
                     Log.e("ArmorBuilder", "Failed to load Charms.");
@@ -593,8 +612,16 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
             @Override
             public void onFailure(@NonNull Call<List<Charm>> call, @NonNull Throwable t) {
                 Log.e("ArmorBuilder", "Error: " + t.getMessage());
+                checkAllApiCompleted();
             }
         });
+    }
+
+    private void checkAllApiCompleted() {
+        completedApiCalls++;
+        if (completedApiCalls == totalApiCalls) {
+            showLoadingScreen(false); // 모든 API 호출이 완료되면 로딩 화면 숨김
+        }
     }
 
     private void searchArmors() {
@@ -789,4 +816,13 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
         }
         return options;
     }
+
+    private void showLoadingScreen(boolean show) {
+        if (show) {
+            loadingLayout.setVisibility(View.VISIBLE);
+        } else {
+            loadingLayout.setVisibility(View.GONE);
+        }
+    }
+
 }

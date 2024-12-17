@@ -2,6 +2,7 @@ package com.example.hunterpedia.weapon;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +34,8 @@ public class WeaponActivity extends AppCompatActivity {
 
     private Spinner typeSpinner, elementSpinner;
     private String selectedType = "All", selectedElement = "All";
+    private LinearLayout loadingLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class WeaponActivity extends AppCompatActivity {
         searchView = findViewById(R.id.weaponSearchView);
         typeSpinner = findViewById(R.id.weaponTypeSpinner);
         elementSpinner = findViewById(R.id.weaponElementSpinner);
+        loadingLayout = findViewById(R.id.loadingLayout);
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new WeaponAdapter(weaponList);
@@ -94,12 +99,15 @@ public class WeaponActivity extends AppCompatActivity {
     }
 
     private void fetchWeapons() {
+        showLoadingScreen(true); // 로딩 화면 표시
+
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Weapon>> call = apiService.getAllWeapons();
 
         call.enqueue(new Callback<List<Weapon>>() {
             @Override
             public void onResponse(Call<List<Weapon>> call, Response<List<Weapon>> response) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 if (response.isSuccessful() && response.body() != null) {
                     weaponList = response.body();
                     filterWeapons();
@@ -108,10 +116,12 @@ public class WeaponActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Weapon>> call, Throwable t) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 t.printStackTrace();
             }
         });
     }
+
 
     private void setupSearchView() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -147,4 +157,15 @@ public class WeaponActivity extends AppCompatActivity {
 
         adapter.updateList(filteredList);
     }
+
+    private void showLoadingScreen(boolean show) {
+        if (show) {
+            loadingLayout.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            loadingLayout.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
 }

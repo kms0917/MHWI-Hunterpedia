@@ -1,8 +1,10 @@
 package com.example.hunterpedia.armor;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import androidx.appcompat.widget.SearchView;
 
@@ -29,6 +31,8 @@ public class ArmorActivity extends AppCompatActivity {
     private List<Armor> armorList = new ArrayList<>();
     private SearchView searchView;
     private Spinner typeSpinner, rankSpinner;
+    private LinearLayout loadingLayout;
+
 
     private String selectedType = "All";
     private String selectedRank = "All";
@@ -43,6 +47,8 @@ public class ArmorActivity extends AppCompatActivity {
         searchView = findViewById(R.id.armorSearchView);
         typeSpinner = findViewById(R.id.armorTypeSpinner);
         rankSpinner = findViewById(R.id.armorRankSpinner);
+        loadingLayout = findViewById(R.id.loadingLayout);
+
 
         // RecyclerView 설정
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -109,12 +115,15 @@ public class ArmorActivity extends AppCompatActivity {
 
     // API를 통해 방어구 가져오기
     private void fetchArmors() {
+        showLoadingScreen(true); // 로딩 화면 표시
+
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Armor>> call = apiService.getAllArmors();
 
         call.enqueue(new Callback<List<Armor>>() {
             @Override
             public void onResponse(Call<List<Armor>> call, Response<List<Armor>> response) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 if (response.isSuccessful() && response.body() != null) {
                     armorList = response.body();
                     adapter.updateList(armorList);
@@ -123,10 +132,12 @@ public class ArmorActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Armor>> call, Throwable t) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 t.printStackTrace();
             }
         });
     }
+
 
     // 필터링 메서드
     private void filterArmors() {
@@ -145,4 +156,15 @@ public class ArmorActivity extends AppCompatActivity {
 
         adapter.updateList(filteredList);
     }
+
+    private void showLoadingScreen(boolean show) {
+        if (show) {
+            loadingLayout.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            loadingLayout.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
 }

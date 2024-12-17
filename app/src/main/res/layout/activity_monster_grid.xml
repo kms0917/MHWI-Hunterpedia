@@ -1,14 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <GridLayout
-        android:id="@+id/monsterGridLayout"
+    <!-- 몬스터 그리드 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <GridLayout
+            android:id="@+id/monsterGridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="4"
+            android:orientation="horizontal" />
+    </ScrollView>
+
+    <!-- 로딩 화면 -->
+    <LinearLayout
+        android:id="@+id/loadingLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnCount="4"
-        android:orientation="horizontal"/>
-</ScrollView>
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#FFFFFF"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/loadingProgressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/loadingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading Monsters..."
+            android:textSize="18sp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+</FrameLayout>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -31,6 +32,7 @@ import retrofit2.Response;
 public class MonsterGridActivity extends AppCompatActivity {
 
     private GridLayout monsterGridLayout;
+    private LinearLayout loadingLayout;
     private List<Monster> monsterList = new ArrayList<>(); // 초기 빈 리스트
 
     private static final String TAG = "MonsterActivity";
@@ -39,6 +41,7 @@ public class MonsterGridActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monster_grid);
+        loadingLayout = findViewById(R.id.loadingLayout);
 
         monsterGridLayout = findViewById(R.id.monsterGridLayout);
 
@@ -47,14 +50,15 @@ public class MonsterGridActivity extends AppCompatActivity {
     }
 
     private void fetchMonsters() {
-        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+        showLoadingScreen(true); // 로딩 화면 표시
 
-        // 몬스터 데이터를 가져오는 Retrofit 호출
+        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
         Call<List<Monster>> call = apiService.getAllMonsters();
 
         call.enqueue(new Callback<List<Monster>>() {
             @Override
             public void onResponse(Call<List<Monster>> call, Response<List<Monster>> response) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 if (response.isSuccessful() && response.body() != null) {
                     monsterList = response.body(); // API로 가져온 몬스터 목록 저장
                     Log.d(TAG, "Total Monsters: " + monsterList.size());
@@ -68,10 +72,12 @@ public class MonsterGridActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Monster>> call, Throwable t) {
+                showLoadingScreen(false); // 로딩 화면 숨김
                 Log.e(TAG, "Error: " + t.getMessage());
             }
         });
     }
+
 
     private void populateMonsterGrid() {
         // 그리드 초기화 (기존 항목 제거)
@@ -190,6 +196,16 @@ public class MonsterGridActivity extends AppCompatActivity {
 
             // Start Activity
             startActivity(intent);
+        }
+    }
+
+    private void showLoadingScreen(boolean show) {
+        if (show) {
+            loadingLayout.setVisibility(View.VISIBLE);
+            monsterGridLayout.setVisibility(View.GONE);
+        } else {
+            loadingLayout.setVisibility(View.GONE);
+            monsterGridLayout.setVisibility(View.VISIBLE);
         }
     }
 }
