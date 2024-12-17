@@ -11,38 +11,81 @@
         android:id="@+id/hunterpedia"
         android:layout_width="321dp"
         android:layout_height="68dp"
-        android:layout_marginStart="16dp"
         android:text="HunterPedia"
         android:textSize="48sp"
-        app:layout_constraintStart_toEndOf="@+id/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="16dp" />
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="81dp"
-        android:layout_height="96dp"
+        android:layout_width="194dp"
+        android:layout_height="260dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/symbol"
-        tools:layout_editor_absoluteY="1dp" />
+        app:layout_constraintTop_toBottomOf="@+id/hunterpedia"
+        app:srcCompat="@drawable/symbol" />
 
     <Button
         android:id="@+id/armorbuilderbtn"
         android:layout_width="147dp"
         android:layout_height="79dp"
-        android:layout_marginTop="132dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="432dp"
+        android:layout_marginEnd="44dp"
         android:text="Recomander"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/armorbtn"
+        android:layout_width="147dp"
+        android:layout_height="79dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="44dp"
+        android:text="Armors"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/armorbuilderbtn" />
+
+    <Button
+        android:id="@+id/quizbtn"
+        android:layout_width="147dp"
+        android:layout_height="79dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="44dp"
+        android:text="Quiz"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/armorbtn" />
+
+    <Button
         android:id="@+id/monsterbtn"
         android:layout_width="147dp"
         android:layout_height="79dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="132dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="432dp"
         android:text="Monster"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/skillbtn"
+        android:layout_width="147dp"
+        android:layout_height="79dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="24dp"
+        android:text="Skills"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/monsterbtn" />
+
+    <Button
+        android:id="@+id/weaponbtn"
+        android:layout_width="147dp"
+        android:layout_height="79dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="24dp"
+        android:text="Weapons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/skillbtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

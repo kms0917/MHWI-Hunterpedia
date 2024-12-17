@@ -13,6 +13,7 @@ import com.example.hunterpedia.api.ApiService;
 import com.example.hunterpedia.builder.BuilderActivity;
 import com.example.hunterpedia.datastructure.Monster;
 import com.example.hunterpedia.datastructure.MonsterWeakness;
+import com.example.hunterpedia.datastructure.Skill;
 
 import java.util.List;
 
@@ -41,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MonsterGridActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button goToSkillButton = findViewById(R.id.skillbtn);
+        goToSkillButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SkillActivity.class);
                 startActivity(intent);
             }
         });

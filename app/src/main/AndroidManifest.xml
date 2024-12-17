@@ -30,6 +30,7 @@
         <activity android:name=".builder.BuilderActivity" />
         <activity android:name=".MonsterGridActivity" />
         <activity android:name=".MonsterDetailActivity" />
+        <activity android:name=".SkillActivity" />
     </application>
 
 </manifest>
