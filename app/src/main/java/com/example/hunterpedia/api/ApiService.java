@@ -3,12 +3,14 @@ package com.example.hunterpedia.api;
 import com.example.hunterpedia.datastructure.Armor;
 import com.example.hunterpedia.datastructure.Charm;
 import com.example.hunterpedia.datastructure.Decoration;
+import com.example.hunterpedia.datastructure.Monster;
 import com.example.hunterpedia.datastructure.Skill;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
@@ -41,4 +43,7 @@ public interface ApiService {
 
     @GET("charms")
     Call<List<Charm>> getCharms();
+
+    @GET("monsters")
+    Call<List<Monster>> getAllMonsters();
 }

@@ -28,6 +28,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".builder.BuilderActivity" />
+        <activity android:name=".MonsterGridActivity" />
+        <activity android:name=".MonsterDetailActivity" />
     </application>
 
 </manifest>

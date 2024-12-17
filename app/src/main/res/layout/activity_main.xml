@@ -31,7 +31,18 @@
         android:layout_height="79dp"
         android:layout_marginTop="132dp"
         android:layout_marginEnd="24dp"
-        android:text="Armor Builder"
+        android:text="Recomander"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/monsterbtn"
+        android:layout_width="147dp"
+        android:layout_height="79dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="132dp"
+        android:text="Monster"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
