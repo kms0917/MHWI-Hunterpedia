@@ -518,13 +518,18 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
 
     private void searchArmors() {
         HashMap<String, List<String>> resultMap = new HashMap<>();
-        List<String> groupList = Arrays.asList("Head Armors", "Chest Armors", "Gloves Armors", "Waist Armors", "Legs Armors");
+        List<String> groupList = Arrays.asList("Head Armors", "Head Armors with Decoration", "Chest Armors", "Chest Armors with Decoration", "Gloves Armors", "Gloves Armors with Decoration", "Waist Armors", "Waist Armors with Decoration", "Legs Armors", "Legs Armors with Decoration");
 
-        resultMap.put("Head Armors", formatArmorResults(filteringHeads(headArmors, 1, 4)));
-        resultMap.put("Chest Armors", formatArmorResults(filteringChests(chestArmors, 1, 4)));
-        resultMap.put("Gloves Armors", formatArmorResults(filteringGloves(glovesArmors, 1, 4)));
-        resultMap.put("Waist Armors", formatArmorResults(filteringWaists(waistArmors, 1, 4)));
-        resultMap.put("Legs Armors", formatArmorResults(filteringLegs(legsArmors, 1, 4)));
+        resultMap.put("Head Armors", formatArmorResults(filteringHeads(headArmors, 1, 4, false)));
+        resultMap.put("Head Armors with Decoration", formatArmorResults(filteringHeads(headArmors, 1, 4, true)));
+        resultMap.put("Chest Armors", formatArmorResults(filteringChests(chestArmors, 1, 4, false)));
+        resultMap.put("Chest Armors with Decoration", formatArmorResults(filteringChests(chestArmors, 1, 4, true)));
+        resultMap.put("Gloves Armors", formatArmorResults(filteringGloves(glovesArmors, 1, 4, false)));
+        resultMap.put("Gloves Armors with Decoration", formatArmorResults(filteringGloves(glovesArmors, 1, 4, true)));
+        resultMap.put("Waist Armors", formatArmorResults(filteringWaists(waistArmors, 1, 4, false)));
+        resultMap.put("Waist Armors with Decoration", formatArmorResults(filteringWaists(waistArmors, 1, 4, true)));
+        resultMap.put("Legs Armors", formatArmorResults(filteringLegs(legsArmors, 1, 4, false)));
+        resultMap.put("Legs Armors with Decoration", formatArmorResults(filteringLegs(legsArmors, 1, 4, true)));
 
         ExpandableListView resultListView = findViewById(R.id.resultExpandableList);
         ExpandableListAdapter adapter = new CustomExpandableListAdapter(this, groupList, resultMap);
@@ -567,71 +572,71 @@ public class BuilderActivity extends AppCompatActivity implements OnSkillSelecte
     }
 
 
-    private List<Pair<Armor, Integer>> filteringHeads(List<Armor> headArmors, int slotMin, int slotMax){
+    private List<Pair<Armor, Integer>> filteringHeads(List<Armor> headArmors, int slotMin, int slotMax, boolean withDeco){
         List<Pair<Armor, Integer>> filteredHead = new ArrayList<>();
         for (Armor armor : headArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            score += calculateSlotScore(armor, slotMin, slotMax);
-            if (score > 3) {
-                filteredHead.add(new Pair<> (armor, score));
+            if (withDeco){
+                score += calculateSlotScore(armor, slotMin, slotMax);
             }
+            filteredHead.add(new Pair<> (armor, score));
         }
         filteredHead.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
         return filteredHead;
     }
 
-    private List<Pair<Armor, Integer>> filteringChests(List<Armor> chestArmors, int slotMin, int slotMax){
+    private List<Pair<Armor, Integer>> filteringChests(List<Armor> chestArmors, int slotMin, int slotMax, boolean withDeco){
         List<Pair<Armor, Integer>> filteredChest = new ArrayList<>();
         for (Armor armor : chestArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            score += calculateSlotScore(armor, slotMin, slotMax);
-            if (score > 3) {
-                filteredChest.add(new Pair<> (armor, score));
+            if (withDeco){
+                score += calculateSlotScore(armor, slotMin, slotMax);
             }
+            filteredChest.add(new Pair<> (armor, score));
         }
         filteredChest.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
         return filteredChest;
     }
 
-    private List<Pair<Armor, Integer>> filteringGloves(List<Armor> glovesArmors, int slotMin, int slotMax){
+    private List<Pair<Armor, Integer>> filteringGloves(List<Armor> glovesArmors, int slotMin, int slotMax, boolean withDeco){
         List<Pair<Armor, Integer>> filteredGloves = new ArrayList<>();
         for (Armor armor : glovesArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            score += calculateSlotScore(armor, slotMin, slotMax);
-            if (score > 3) {
-                filteredGloves.add(new Pair<> (armor, score));
+            if (withDeco){
+                score += calculateSlotScore(armor, slotMin, slotMax);
             }
+            filteredGloves.add(new Pair<> (armor, score));
         }
         filteredGloves.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
         return filteredGloves;
     }
 
-    private List<Pair<Armor, Integer>> filteringWaists(List<Armor> waistArmors, int slotMin, int slotMax){
+    private List<Pair<Armor, Integer>> filteringWaists(List<Armor> waistArmors, int slotMin, int slotMax, boolean withDeco){
         List<Pair<Armor, Integer>> filteredWaist = new ArrayList<>();
         for (Armor armor : waistArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            score += calculateSlotScore(armor, slotMin, slotMax);
-            if (score > 3) {
-                filteredWaist.add(new Pair<> (armor, score));
+            if (withDeco){
+                score += calculateSlotScore(armor, slotMin, slotMax);
             }
+            filteredWaist.add(new Pair<> (armor, score));
         }
         filteredWaist.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
         return filteredWaist;
     }
 
-    private List<Pair<Armor, Integer>> filteringLegs(List<Armor> legsArmors, int slotMin, int slotMax){
+    private List<Pair<Armor, Integer>> filteringLegs(List<Armor> legsArmors, int slotMin, int slotMax, boolean withDeco){
         List<Pair<Armor, Integer>> filteredLegs = new ArrayList<>();
         for (Armor armor : legsArmors){
             int score = 0;
             score += calculateSkillScore(armor);
-            score += calculateSlotScore(armor, slotMin, slotMax);
-            if (score > 3) {
-                filteredLegs.add(new Pair<> (armor, score));
+            if (withDeco){
+                score += calculateSlotScore(armor, slotMin, slotMax);
             }
+            filteredLegs.add(new Pair<> (armor, score));
         }
         filteredLegs.sort((pair1, pair2) -> Integer.compare(pair2.second, pair1.second));
         return filteredLegs;
