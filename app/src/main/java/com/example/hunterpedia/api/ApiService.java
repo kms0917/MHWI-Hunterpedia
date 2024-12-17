@@ -36,8 +36,8 @@ public interface ApiService {
     @GET("armor?q={\"type\":\"legs\", \"rank\":\"master\"}")
     Call<List<Armor>> getLegsArmors();
 
-    @GET("armor?q={\"rank\":\"high\"}")
-    Call<List<Armor>> getHighArmors();
+    @GET("armor")
+    Call<List<Armor>> getAllArmors();
 
     @GET("decorations")
     Call<List<Decoration>> getDecorations();

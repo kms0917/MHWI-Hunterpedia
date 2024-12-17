@@ -64,5 +64,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button goToQuizButton = findViewById(R.id.quizbtn);
+        goToQuizButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MonsterQuizActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -17,8 +17,8 @@ import java.util.List;
 
 public class ArmorAdapter extends RecyclerView.Adapter<ArmorAdapter.ArmorViewHolder> {
 
-    private List<Armor> armorList;
-    private List<Armor> armorListFull; // 원본 데이터 리스트
+    private List<Armor> armorList;           // 필터링된 리스트
+    private List<Armor> armorListFull;       // 원본 리스트
 
     public ArmorAdapter(List<Armor> armorList) {
         this.armorList = armorList;
@@ -77,19 +77,12 @@ public class ArmorAdapter extends RecyclerView.Adapter<ArmorAdapter.ArmorViewHol
         return armorList.size();
     }
 
-    // 필터링 메서드
-    public void filter(String text) {
+    /**
+     * 리스트 업데이트 메서드 - 외부에서 새로운 리스트로 업데이트
+     */
+    public void updateList(List<Armor> newList) {
         armorList.clear();
-        if (text.isEmpty()) {
-            armorList.addAll(armorListFull);
-        } else {
-            text = text.toLowerCase();
-            for (Armor armor : armorListFull) {
-                if (armor.getName().toLowerCase().contains(text)) {
-                    armorList.add(armor);
-                }
-            }
-        }
+        armorList.addAll(newList);
         notifyDataSetChanged();
     }
 
@@ -106,3 +99,4 @@ public class ArmorAdapter extends RecyclerView.Adapter<ArmorAdapter.ArmorViewHol
         }
     }
 }
+

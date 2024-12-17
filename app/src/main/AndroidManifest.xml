@@ -33,6 +33,7 @@
         <activity android:name=".skill.SkillActivity" />
         <activity android:name=".armor.ArmorActivity" />
         <activity android:name=".weapon.WeaponActivity" />
+        <activity android:name=".MonsterQuizActivity" />
     </application>
 
 </manifest>
